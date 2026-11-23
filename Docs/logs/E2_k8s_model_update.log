@@ -1,0 +1,47 @@
+$ curl http://btc-forecast.local/health   # Kubernetes BEFORE
+{"status":"ok","uptime_seconds":14.8,"model_loaded":true,"model_version":"v20261123-1217","model_name":"Ensemble (XGBoost + Random Forest)","model_stage":"production","pod":"btc-forecast-api-75f9549999-qkrcg"}
+
+
+$ cat models/model_version.txt   # model trained + registered by the Airflow DAG
+v20261123-2224
+
+$ kubectl cp models/{model.pkl,metrics.json,model_version.txt} btc-forecast-api-75f9549999-7wmfp:/app/models/   # into the shared PVC
+copied model.pkl
+copied metrics.json
+copied model_version.txt
+
+$ kubectl exec btc-forecast-api-75f9549999-7wmfp -- ls -l /app/models
+total 576
+-rw-r--r-- 1 appuser appuser   4817 Nov 23 22:30 metrics.json
+-rw-r--r-- 1 appuser appuser 576565 Nov 23 22:30 model.pkl
+-rw-r--r-- 1 appuser appuser     15 Nov 23 22:30 model_version.txt
+
+# POST /reload on every API pod (X-API-Key from the Kubernetes Secret)
+btc-forecast-api-75f9549999-7wmfp: {"status":"reloaded","previous_version":"v20261123-1217","model_version":"v20261123-2224"}
+
+btc-forecast-api-75f9549999-gfjhl: {"status":"reloaded","previous_version":"v20261123-1217","model_version":"v20261123-2224"}
+
+btc-forecast-api-75f9549999-m72d8: {"status":"reloaded","previous_version":"v20261123-1217","model_version":"v20261123-2224"}
+
+btc-forecast-api-75f9549999-qkrcg: {"status":"reloaded","previous_version":"v20261123-1217","model_version":"v20261123-2224"}
+
+btc-forecast-api-75f9549999-w49qr: {"status":"reloaded","previous_version":"v20261123-1217","model_version":"v20261123-2224"}
+
+
+$ curl http://btc-forecast.local/health   # Kubernetes AFTER
+{"status":"ok","uptime_seconds":38.0,"model_loaded":true,"model_version":"v20261123-2224","model_name":"Ensemble (XGBoost + Random Forest)","model_stage":"production","pod":"btc-forecast-api-75f9549999-7wmfp"}
+
+{"status":"ok","uptime_seconds":46.2,"model_loaded":true,"model_version":"v20261123-2224","model_name":"Ensemble (XGBoost + Random Forest)","model_stage":"production","pod":"btc-forecast-api-75f9549999-m72d8"}
+
+{"status":"ok","uptime_seconds":30.1,"model_loaded":true,"model_version":"v20261123-2224","model_name":"Ensemble (XGBoost + Random Forest)","model_stage":"production","pod":"btc-forecast-api-75f9549999-gfjhl"}
+
+
+$ curl -X POST http://btc-forecast.local/predict -d "{\"forecast_days\": 7}"
+model v20261123-2224 | last close 61161.91 on 2026-11-22
+  2026-11-23   61092.41 (-0.11%)
+  2026-11-24   61149.15 (-0.02%)
+  2026-11-25   61358.21 (+0.32%)
+  2026-11-26   61262.53 (+0.17%)
+  2026-11-27   61257.59 (+0.16%)
+  2026-11-28   61088.03 (-0.12%)
+  2026-11-29   61023.35 (-0.23%)

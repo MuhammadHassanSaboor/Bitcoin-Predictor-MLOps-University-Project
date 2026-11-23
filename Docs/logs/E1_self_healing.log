@@ -1,0 +1,110 @@
+$ kubectl get pods -l app=btc-forecast-api   # BEFORE
+NAME                                READY   STATUS    RESTARTS   AGE
+btc-forecast-api-76b9d878cd-8g6fn   1/1     Running   0          11m
+btc-forecast-api-76b9d878cd-qs2pj   1/1     Running   0          11m
+
+$ kubectl delete pod btc-forecast-api-76b9d878cd-8g6fn    # 03:22:47
+pod "btc-forecast-api-76b9d878cd-8g6fn" deleted from default namespace
+
+$ kubectl get pods -l app=btc-forecast-api -w   (sampled every 3s)
+--- 03:22:47
+btc-forecast-api-76b9d878cd-8g6fn   1/1   Terminating         0     11m
+btc-forecast-api-76b9d878cd-cntgx   0/1   ContainerCreating   0     1s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running             0     11m
+--- 03:22:51
+btc-forecast-api-76b9d878cd-cntgx   0/1   ContainerCreating   0     4s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running             0     11m
+--- 03:22:55
+btc-forecast-api-76b9d878cd-cntgx   0/1   Running   0     8s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     11m
+--- 03:22:59
+btc-forecast-api-76b9d878cd-cntgx   0/1   Running   0     12s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     11m
+--- 03:23:02
+btc-forecast-api-76b9d878cd-cntgx   0/1   Running   0     16s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     11m
+--- 03:23:06
+btc-forecast-api-76b9d878cd-cntgx   1/1   Running   0     19s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     11m
+--- 03:23:09
+btc-forecast-api-76b9d878cd-cntgx   1/1   Running   0     23s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     11m
+--- 03:23:13
+btc-forecast-api-76b9d878cd-cntgx   1/1   Running   0     26s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     11m
+--- 03:23:16
+btc-forecast-api-76b9d878cd-cntgx   1/1   Running   0     30s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     11m
+--- 03:23:20
+btc-forecast-api-76b9d878cd-cntgx   1/1   Running   0     33s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     11m
+--- 03:23:23
+btc-forecast-api-76b9d878cd-cntgx   1/1   Running   0     37s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     12m
+--- 03:23:27
+btc-forecast-api-76b9d878cd-cntgx   1/1   Running   0     40s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     12m
+--- 03:23:31
+btc-forecast-api-76b9d878cd-cntgx   1/1   Running   0     44s
+btc-forecast-api-76b9d878cd-qs2pj   1/1   Running   0     12m
+
+$ kubectl get events (ReplicaSet / pod lifecycle)
+2m51s       Normal    Killing                        pod/btc-forecast-api-76b9d878cd-9r56s      Stopping container api
+2m21s       Normal    SuccessfulDelete               replicaset/btc-forecast-api-76b9d878cd     Deleted pod: btc-forecast-api-76b9d878cd-mmdfn
+2m21s       Normal    Killing                        pod/btc-forecast-api-76b9d878cd-mmdfn      Stopping container api
+111s        Normal    Killing                        pod/btc-forecast-api-76b9d878cd-lzvgx      Stopping container api
+111s        Normal    SuccessfulDelete               replicaset/btc-forecast-api-76b9d878cd     Deleted pod: btc-forecast-api-76b9d878cd-lzvgx
+75s         Normal    SuccessfulCreate               replicaset/btc-forecast-api-76b9d878cd     Created pod: btc-forecast-api-76b9d878cd-cntgx
+75s         Normal    Killing                        pod/btc-forecast-api-76b9d878cd-8g6fn      Stopping container api
+75s         Normal    Scheduled                      pod/btc-forecast-api-76b9d878cd-cntgx      Successfully assigned default/btc-forecast-api-76b9d878cd-cntgx to minikube
+73s         Warning   Unhealthy                      pod/btc-forecast-api-76b9d878cd-8g6fn      Readiness probe failed: Get "http://10.244.0.9:5000/health": dial tcp 10.244.0.9:5000: connect: connection refused
+70s         Normal    Started                        pod/btc-forecast-api-76b9d878cd-cntgx      Container started
+
+# API availability during the test (curl http://btc-forecast.local/health every second)
+03:22:47 GET /health -> 200 OK
+03:22:48 GET /health -> 200 OK
+03:22:50 GET /health -> 200 OK
+03:22:52 GET /health -> 200 OK
+03:22:53 GET /health -> 200 OK
+03:22:55 GET /health -> 200 OK
+03:22:57 GET /health -> 200 OK
+03:22:59 GET /health -> 200 OK
+03:23:00 GET /health -> 200 OK
+03:23:02 GET /health -> 200 OK
+03:23:04 GET /health -> 200 OK
+03:23:05 GET /health -> 200 OK
+03:23:07 GET /health -> 200 OK
+03:23:09 GET /health -> 200 OK
+03:23:11 GET /health -> 200 OK
+03:23:12 GET /health -> 200 OK
+03:23:14 GET /health -> 200 OK
+03:23:16 GET /health -> 200 OK
+03:23:17 GET /health -> 200 OK
+03:23:19 GET /health -> 200 OK
+03:23:21 GET /health -> 200 OK
+03:23:22 GET /health -> 200 OK
+03:23:24 GET /health -> 200 OK
+03:23:26 GET /health -> 200 OK
+03:23:27 GET /health -> 200 OK
+03:23:29 GET /health -> 200 OK
+03:23:31 GET /health -> 200 OK
+03:23:33 GET /health -> 200 OK
+03:23:35 GET /health -> 200 OK
+03:23:36 GET /health -> 200 OK
+03:23:38 GET /health -> 200 OK
+03:23:40 GET /health -> 200 OK
+03:23:41 GET /health -> 200 OK
+03:23:43 GET /health -> 200 OK
+03:23:45 GET /health -> 200 OK
+03:23:47 GET /health -> 200 OK
+03:23:48 GET /health -> 200 OK
+03:23:50 GET /health -> 200 OK
+03:23:51 GET /health -> 200 OK
+03:23:53 GET /health -> 200 OK
+03:23:54 GET /health -> 200 OK
+03:23:56 GET /health -> 200 OK
+03:23:57 GET /health -> 200 OK
+03:23:59 GET /health -> 200 OK
+03:24:00 GET /health -> 200 OK
+
+# Summary: 45 of 45 requests returned 200
