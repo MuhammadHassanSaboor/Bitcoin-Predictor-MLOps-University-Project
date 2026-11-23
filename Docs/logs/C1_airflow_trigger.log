@@ -1,0 +1,39 @@
+$ docker compose ps
+NAME                    STATUS                             PORTS
+btc-airflow-scheduler   Up 35 seconds (healthy)            8080/tcp
+btc-airflow-webserver   Up 35 seconds (health: starting)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+btc-api                 Up 55 seconds (healthy)            0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp
+btc-postgres            Up 54 seconds (healthy)            5432/tcp
+btc-ui                  Up 54 seconds (healthy)            0.0.0.0:3000->8080/tcp, [::]:3000->8080/tcp
+
+$ airflow dags list-import-errors
+No data found
+
+$ airflow dags list
+dag_id           | fileloc                               | owners   | is_paused
+btc_etl_pipeline | /opt/airflow/dags/btc_etl_pipeline.py | mudassar | True     
+
+$ airflow tasks list btc_etl_pipeline --tree
+<Task(_PythonDecoratedOperator): fetch_data>
+    <Task(_PythonDecoratedOperator): preprocess_features>
+        <Task(_PythonDecoratedOperator): train_and_evaluate>
+            <Task(_PythonDecoratedOperator): reload_api_model>
+
+$ curl http://localhost:5000/health   # BEFORE the run
+{"status":"ok","uptime_seconds":62.0,"model_loaded":true,"model_version":"v20261123-1217","model_name":"Ensemble (XGBoost + Random Forest)","model_stage":"local","pod":"48b8f6c0efc2"}
+
+
+$ airflow dags unpause btc_etl_pipeline
+dag_id           | is_paused
+=================+==========
+btc_etl_pipeline | False    
+                            
+
+$ airflow dags trigger btc_etl_pipeline
+[2026-11-23T21:34:29.374+0000] {__init__.py:43} INFO - Loaded API auth backend: airflow.api.auth.backend.session
+     |                  |                      |                      |                      |          |                  | last_scheduling_deci |                     |          |            |       
+conf | dag_id           | dag_run_id           | data_interval_start  | data_interval_end    | end_date | external_trigger | sion                 | logical_date        | run_type | start_date | state 
+=====+==================+======================+======================+======================+==========+==================+======================+=====================+==========+============+=======
+{}   | btc_etl_pipeline | manual__2026-11-23T2 | 2026-11-22           | 2026-11-23           | None     | True             | None                 | 2026-11-23          | manual   | None       | queued
+     |                  | 1:34:29+00:00        | 00:00:00+00:00       | 00:00:00+00:00       |          |                  |                      | 21:34:29+00:00      |          |            |       
+                                                                                                                                                                                                        

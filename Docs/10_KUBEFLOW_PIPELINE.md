@@ -50,5 +50,5 @@ You can also upload `btc_kfp_pipeline.yaml` in the KFP UI (*Pipelines → Upload
 
 | File | Shows |
 |---|---|
-| `C2_kfp_compile.png` | terminal: `python kubeflow/btc_kfp_pipeline.py` → compiled |
-| `C2_kfp_yaml.png` | the compiled YAML open in VS Code (components + DAG section) |
+| `C2_kfp_compile.png` | `python kubeflow/btc_kfp_pipeline.py` → compiled with kfp 2.18.2; task DAG, inputs/outputs and images (log: `Docs/logs/C2_kfp_compile.log`) |
+| `C2_kfp_yaml.png` | excerpt of the compiled YAML: the `train-model` container executor and the pipeline DAG |

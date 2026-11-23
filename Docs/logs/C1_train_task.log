@@ -1,0 +1,12 @@
+# Airflow task log: train_and_evaluate (manual__2026-11-23T21:34:29+00:00)
+INFO - 2026-11-23 22:05:59,017 INFO train_forecast: Re-using saved best params from /opt/***/models/best_params.json
+INFO - 2026-11-23 22:15:13,748 INFO train_forecast: xgboost        {'train_window': None, 'subsample': 1.0, 'reg_lambda': 10, 'objective': 'reg:absoluteerror', 'n_estimat
+INFO - 2026-11-23 22:15:18,305 INFO train_forecast: random_forest  {'train_window': 730, 'n_estimators': 300, 'min_samples_leaf': 100, 'max_features': 0.3, 'max_depth': N
+INFO - 2026-11-23 22:15:18,319 INFO train_forecast: ridge          {'train_window': 730, 'alpha': 1000}                                                       CV MAPE 3.15
+INFO - 2026-11-23 22:15:20,797 INFO train_forecast: extra_trees    {'train_window': 730, 'n_estimators': 300, 'min_samples_leaf': 100, 'max_features': 0.3, 'max_depth': N
+INFO - 2026-11-23 22:21:35,832 INFO train_forecast: lightgbm       {'train_window': 1460, 'subsample_freq': 1, 'subsample': 0.9, 'reg_lambda': 20, 'objective': 'l1', 'num
+INFO - 2026-11-23 22:21:35,833 INFO train_forecast: Best candidate: Ensemble (XGBoost + Random Forest) (CV MAPE 3.129%) in 937s
+INFO - 2026-11-23 22:24:25,333 INFO train_forecast: Model v20261123-2224 REGISTERED (test MAPE 5.490% < 10.0%)
+INFO - Model v20261123-2224 (Ensemble (XGBoost + Random Forest)): MAE=3330.13 RMSE=3977.17 MAPE=5.490% registered=True
+INFO - Done. Returned value was: {'model_version': 'v20261123-2224', 'model_name': 'Ensemble (XGBoost + Random Forest)', 'test_mae': 3330.13, 'test_rmse': 3977.17, 'test_
+INFO - Marking task as SUCCESS. dag_id=btc_etl_pipeline, task_id=train_and_evaluate, run_id=manual__2026-11-23T21:34:29+00:00, execution_date=20261123T213429, start_date=

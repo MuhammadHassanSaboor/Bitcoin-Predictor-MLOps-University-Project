@@ -1,0 +1,13 @@
+# Airflow task log: reload_api_model (manual__2026-11-23T21:34:29+00:00)
+INFO - API reloaded: v20261123-1217 -> v20261123-2224
+INFO - Done. Returned value was: {'status': 'reloaded', 'previous_version': 'v20261123-1217', 'model_version': 'v20261123-2224'}
+INFO - Marking task as SUCCESS. dag_id=btc_etl_pipeline, task_id=reload_api_model, run_id=manual__2026-11-23T21:34:29+00:00, execution_date=20261123T213429, start_date=20261123T222427, end_date=202611
+
+# Airflow task log: fetch_data / preprocess_features
+INFO - Fetched 3613 rows from yfinance (2017-01-01 -> 2026-11-22)
+INFO - Saved raw data to data/raw/btc_raw.csv
+INFO - Fetched 3613 rows (2017-01-01 -> 2026-11-22)
+INFO - Done. Returned value was: {'rows': 3613, 'first_date': '2017-01-01', 'last_date': '2026-11-22', 'last_close': 61161.91, 'path': 'data/raw/btc_raw.csv'}
+INFO - Saved 3553 rows x 38 cols to data/processed/btc_features.csv
+INFO - Built 3553 rows with 21 features from data/raw/btc_raw.csv
+INFO - Done. Returned value was: {'rows': 3553, 'features': 21, 'path': 'data/processed/btc_features.csv'}

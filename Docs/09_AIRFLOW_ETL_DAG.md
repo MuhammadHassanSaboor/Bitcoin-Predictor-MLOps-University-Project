@@ -19,6 +19,28 @@ fetch_data ──▶ preprocess_features ──▶ train_and_evaluate ──▶ 
 
 Each task returns a small dict, so the results show up in the **XCom** tab. Retries: 2, 2 minutes apart.
 
+**Why training runs in a subprocess.** The first run trained and registered a model, but
+`reload_api_model` failed with HTTP 500. The API log showed `ModuleNotFoundError: No module named 'dill'`.
+Airflow imports `dill` inside every task, and dill patches the pure-Python pickler that joblib uses, so the
+saved `model.pkl` depended on dill, which the API image doesn't have. `train_and_evaluate` now runs
+`src.train_forecast.main()` in a clean `python` subprocess. The model is plain joblib again, and
+scikit-learn can use all CPU cores (inside the forked Airflow task it fell back to `n_jobs=1`).
+
+## Result of the manual run (2026-11-23)
+
+| Task | Duration | Output |
+|---|---|---|
+| `fetch_data` | 8 s | 3,613 daily rows from yfinance (2017-01-01 → 2026-11-22) |
+| `preprocess_features` | 2 s | 3,553 rows × 21 features |
+| `train_and_evaluate` | ~18 min* | Ensemble (XGBoost + Random Forest), CV MAPE 3.13%; test window MAE 3,330, RMSE 3,977, **MAPE 5.49% < 10% → REGISTERED** `v20261123-2224` |
+| `reload_api_model` | 1 s | API reloaded `v20261123-1217 → v20261123-2224` |
+
+\* This laptop was running Minikube at the same time; the same step takes a few minutes on its own.
+
+Evidence: `C1_dag_graph.png` (all 4 green), `C1_dag_list.png`, `C1_dag_loaded.png`, `C1_trigger.png`,
+`C1_train_log_ui.png`, `C1_reload_log_ui.png`, `C1_train_task_log.png`, `C1_reload_task_log.png`,
+`C1_run_success_health.png` and the matching files in `Docs/logs/C1_*`.
+
 ## Run it
 
 ```powershell
