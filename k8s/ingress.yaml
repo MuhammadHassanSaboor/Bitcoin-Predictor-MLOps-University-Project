@@ -1,0 +1,62 @@
+# D6 - NGINX Ingress for http://btc-forecast.local
+#   minikube addons enable ingress
+#   hosts file: 127.0.0.1 btc-forecast.local   (keep `minikube tunnel` running)
+#
+# API endpoints go straight to the Flask service; everything else goes to the
+# React dashboard (frontend.yaml), whose Nginx also proxies /api/* to the API.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: btc-forecast
+  labels:
+    app.kubernetes.io/part-of: btc-forecast
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: btc-forecast.local
+      http:
+        paths:
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: btc-forecast-api
+                port:
+                  number: 80
+          - path: /predict
+            pathType: Exact
+            backend:
+              service:
+                name: btc-forecast-api
+                port:
+                  number: 80
+          - path: /metrics
+            pathType: Exact
+            backend:
+              service:
+                name: btc-forecast-api
+                port:
+                  number: 80
+          - path: /history
+            pathType: Exact
+            backend:
+              service:
+                name: btc-forecast-api
+                port:
+                  number: 80
+          - path: /reload
+            pathType: Exact
+            backend:
+              service:
+                name: btc-forecast-api
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: btc-forecast-ui
+                port:
+                  number: 80

@@ -1,0 +1,35 @@
+# D4 - internal (ClusterIP) and external (NodePort) access to the API pods.
+# Port 80 on the Service -> targetPort 5000 in the container.
+apiVersion: v1
+kind: Service
+metadata:
+  name: btc-forecast-api
+  labels:
+    app: btc-forecast-api
+    app.kubernetes.io/part-of: btc-forecast
+spec:
+  type: ClusterIP
+  selector:
+    app: btc-forecast-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5000
+---
+# Reach it from the laptop:  minikube service btc-forecast-nodeport --url
+apiVersion: v1
+kind: Service
+metadata:
+  name: btc-forecast-nodeport
+  labels:
+    app: btc-forecast-api
+    app.kubernetes.io/part-of: btc-forecast
+spec:
+  type: NodePort
+  selector:
+    app: btc-forecast-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5000
+      nodePort: 30080

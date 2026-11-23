@@ -1,0 +1,77 @@
+# D3 - Flask + Gunicorn forecast API.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: btc-forecast-api
+  labels:
+    app: btc-forecast-api
+    app.kubernetes.io/part-of: btc-forecast
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: btc-forecast-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0 # never drop below the desired count during an update
+  template:
+    metadata:
+      labels:
+        app: btc-forecast-api
+        app.kubernetes.io/part-of: btc-forecast
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000 # appuser in the image
+        runAsGroup: 1000
+        fsGroup: 1000 # lets appuser write to the PVC
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: api
+          image: hassansaboor/btc-forecast-api:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: btc-api-config
+            - secretRef:
+                name: btc-api-secret
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe: # restart a frozen container
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe: # only send traffic once the app answers
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: models
+              mountPath: /app/models
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: btc-models-pvc
