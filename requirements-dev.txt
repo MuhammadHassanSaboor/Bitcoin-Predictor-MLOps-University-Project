@@ -1,0 +1,5 @@
+# Everything needed for local development, tests and linting
+-r app/requirements.txt
+pytest==9.2.0
+flake8==7.4.1
+black==26.10.1

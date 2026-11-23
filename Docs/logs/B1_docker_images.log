@@ -1,0 +1,8 @@
+REPOSITORY               TAG                 SIZE
+local/btc-forecast-api   latest              803MB
+btc-forecast-api         latest              803MB
+local/btc-forecast-ui    latest              75.6MB
+btc-forecast-ui          latest              75.6MB
+postgres                 16-alpine           420MB
+python                   3.10-slim           186MB
+apache/airflow           2.10.4-python3.10   2.11GB

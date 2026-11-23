@@ -1,0 +1,3 @@
+2026-11-23 18:36:12,403 INFO etl_fetch: Fetched 3613 rows from yfinance (2017-01-01 -> 2026-11-22)
+2026-11-23 18:36:12,448 INFO etl_fetch: Saved raw data to data\raw\btc_raw.csv
+{'rows': 3613, 'first_date': '2017-01-01', 'last_date': '2026-11-22', 'last_close': 61161.91, 'path': 'data\\raw\\btc_raw.csv'}

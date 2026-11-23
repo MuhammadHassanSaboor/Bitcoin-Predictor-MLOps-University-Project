@@ -1,0 +1,25 @@
+{
+    "model_version": "v20261123-1217",
+    "model_name": "Ensemble (XGBoost + Random Forest)",
+    "trained_at": "2026-11-23T12:17:57+00:00",
+    "data_last_date": "2026-11-22",
+    "mae": 3316.91,
+    "rmse": 3957.74,
+    "mape": 5.468,
+    "direction_accuracy": 14.3,
+    "baseline_naive": {
+        "mae": 3205.94,
+        "rmse": 3854.02,
+        "mape": 5.288
+    },
+    "cv": {
+        "method": "walk-forward, 6 folds x 60 days, 7-day purge gap",
+        "mape": 3.1292,
+        "naive_mape": 3.1184
+    },
+    "threshold": {
+        "mape_max": 10.0,
+        "passed": true
+    },
+    "registered": true
+}

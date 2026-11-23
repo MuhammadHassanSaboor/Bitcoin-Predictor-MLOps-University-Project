@@ -1,0 +1,142 @@
+# Local integrated environment:
+#   Flask API + React dashboard + Airflow (webserver, scheduler) + Postgres
+#
+#   docker compose up -d --build
+#   API        -> http://localhost:5000/health
+#   Dashboard  -> http://localhost:3000
+#   Airflow    -> http://localhost:8080   (user/pass from .env, default admin/admin)
+#
+# Settings come from a local .env file (copy .env.example -> .env). Never commit .env.
+
+x-airflow-common: &airflow-common
+  # Official Airflow image + the system library and ML packages our pipeline needs.
+  # Same library versions as the API image, so a model trained by Airflow loads in the API.
+  build:
+    context: .
+    dockerfile_inline: |
+      FROM apache/airflow:2.10.4-python3.10
+      USER root
+      RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
+          && rm -rf /var/lib/apt/lists/*
+      USER airflow
+      RUN pip install --no-cache-dir apache-airflow==2.10.4 yfinance==1.8.0 \
+          scikit-learn==1.5.2 xgboost-cpu==2.1.3 lightgbm==4.5.0 joblib==1.6.0
+  image: btc-airflow:2.10.4
+  environment: &airflow-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@postgres/${POSTGRES_DB:-airflow}
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY:-local-dev-only}
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+    # Lets DAG tasks do `from src.etl_fetch import main`
+    PYTHONPATH: /opt/airflow
+    DATA_DIR: /opt/airflow/data
+    MODEL_DIR: /opt/airflow/models
+    API_URL: http://api:5000
+    API_KEY: ${API_KEY:-local-dev-key}
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./src:/opt/airflow/src
+    - ./data:/opt/airflow/data
+    - ./models:/opt/airflow/models
+    - airflow-logs:/opt/airflow/logs
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on: &airflow-depends
+    postgres:
+      condition: service_healthy
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    image: ${DOCKER_USERNAME:-local}/btc-forecast-api:latest
+    container_name: btc-api
+    ports:
+      - "5000:5000"
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      MODEL_STAGE: local
+      API_KEY: ${API_KEY:-local-dev-key}
+    volumes:
+      - ./models:/app/models
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: ./frontend
+    image: ${DOCKER_USERNAME:-local}/btc-forecast-ui:latest
+    container_name: btc-ui
+    ports:
+      - "3000:8080"
+    environment:
+      API_UPSTREAM: api:5000
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: btc-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-airflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
+      POSTGRES_DB: ${POSTGRES_DB:-airflow}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-airflow}"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: btc-airflow-init
+    entrypoint: /bin/bash
+    command: -c "airflow db migrate && airflow users create --role Admin --username $${AIRFLOW_ADMIN_USER} --password $${AIRFLOW_ADMIN_PASSWORD} --firstname Admin --lastname User --email admin@example.com || true"
+    environment:
+      <<: *airflow-env
+      AIRFLOW_ADMIN_USER: ${AIRFLOW_ADMIN_USER:-admin}
+      AIRFLOW_ADMIN_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD:-admin}
+    restart: "no"
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: btc-airflow-webserver
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      <<: *airflow-depends
+      airflow-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: btc-airflow-scheduler
+    command: scheduler
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      <<: *airflow-depends
+      airflow-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  airflow-logs:

@@ -1,0 +1,52 @@
+============================= test session starts =============================
+platform win32 -- Python 3.10.22, pytest-9.2.0, pluggy-1.7.0 -- C:\Users\hp\miniconda3\envs\btc_mlops\python.exe
+cachedir: .pytest_cache
+rootdir: BTC Price Predictor
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.12.4
+collecting ... collected 41 items
+
+tests/test_app.py::test_health_ok PASSED                                 [  2%]
+tests/test_app.py::test_health_without_model_still_answers PASSED        [  4%]
+tests/test_app.py::test_predict_default_is_7_days PASSED                 [  7%]
+tests/test_app.py::test_predict_without_body PASSED                      [  9%]
+tests/test_app.py::test_predict_dates_follow_last_date PASSED            [ 12%]
+tests/test_app.py::test_predict_custom_days[1] PASSED                    [ 14%]
+tests/test_app.py::test_predict_custom_days[3] PASSED                    [ 17%]
+tests/test_app.py::test_predict_custom_days[7] PASSED                    [ 19%]
+tests/test_app.py::test_predict_with_custom_history PASSED               [ 21%]
+tests/test_app.py::test_predict_rejects_bad_input[payload0-integer] PASSED [ 24%]
+tests/test_app.py::test_predict_rejects_bad_input[payload1-between] PASSED [ 26%]
+tests/test_app.py::test_predict_rejects_bad_input[payload2-between] PASSED [ 29%]
+tests/test_app.py::test_predict_rejects_bad_input[payload3-integer] PASSED [ 31%]
+tests/test_app.py::test_predict_rejects_bad_input[payload4-integer] PASSED [ 34%]
+tests/test_app.py::test_predict_rejects_bad_input[payload5-list] PASSED  [ 36%]
+tests/test_app.py::test_predict_rejects_bad_input[payload6-between] PASSED [ 39%]
+tests/test_app.py::test_predict_rejects_bad_input[payload7-positive] PASSED [ 41%]
+tests/test_app.py::test_predict_rejects_bad_input[payload8-positive] PASSED [ 43%]
+tests/test_app.py::test_predict_rejects_bad_input[payload9-together] PASSED [ 46%]
+tests/test_app.py::test_predict_rejects_bad_input[payload10-YYYY-MM-DD] PASSED [ 48%]
+tests/test_app.py::test_predict_rejects_non_object_json PASSED           [ 51%]
+tests/test_app.py::test_predict_rejects_invalid_json PASSED              [ 53%]
+tests/test_app.py::test_predict_without_model_returns_503 PASSED         [ 56%]
+tests/test_app.py::test_predict_internal_error_returns_500 PASSED        [ 58%]
+tests/test_app.py::test_metrics PASSED                                   [ 60%]
+tests/test_app.py::test_history PASSED                                   [ 63%]
+tests/test_app.py::test_history_bad_days[0] PASSED                       [ 65%]
+tests/test_app.py::test_history_bad_days[abc] PASSED                     [ 68%]
+tests/test_app.py::test_history_bad_days[1000] PASSED                    [ 70%]
+tests/test_app.py::test_reload PASSED                                    [ 73%]
+tests/test_app.py::test_reload_requires_api_key_when_set PASSED          [ 75%]
+tests/test_app.py::test_unknown_route_is_json_404 PASSED                 [ 78%]
+tests/test_app.py::test_wrong_method_is_json_405 PASSED                  [ 80%]
+tests/test_pipeline.py::test_clean_fills_missing_days_and_sorts PASSED   [ 82%]
+tests/test_pipeline.py::test_features_are_scale_free PASSED              [ 85%]
+tests/test_pipeline.py::test_feature_names_match_builder PASSED          [ 87%]
+tests/test_pipeline.py::test_targets_are_future_log_returns PASSED       [ 90%]
+tests/test_pipeline.py::test_dataset_has_indicators PASSED               [ 92%]
+tests/test_pipeline.py::test_price_metrics PASSED                        [ 95%]
+tests/test_pipeline.py::test_return_mape_zero_when_perfect PASSED        [ 97%]
+tests/test_pipeline.py::test_walk_forward_splits_have_no_leakage PASSED  [100%]
+
+============================= 41 passed in 1.68s ==============================

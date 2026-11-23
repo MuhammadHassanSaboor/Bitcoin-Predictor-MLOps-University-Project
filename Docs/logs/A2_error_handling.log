@@ -1,0 +1,14 @@
+{"error":"Bad Request","message":"'forecast_days' must be an integer"}
+ -> HTTP 400
+{"error":"Bad Request","message":"'forecast_days' must be between 1 and 7"}
+ -> HTTP 400
+{"error":"Bad Request","message":"'history' must contain between 60 and 5000 prices"}
+ -> HTTP 400
+{"error":"Bad Request","message":"Request body is not valid JSON"}
+ -> HTTP 400
+{"error":"Unauthorized","message":"Missing or wrong X-API-Key header"}
+ -> HTTP 401
+{"error":"Not Found","message":"The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."}
+ -> HTTP 404
+{"error":"Method Not Allowed","message":"The method is not allowed for the requested URL."}
+ -> HTTP 405
