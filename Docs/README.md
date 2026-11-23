@@ -13,6 +13,9 @@ Read in this order:
 | 6 | [06_REACT_DASHBOARD.md](06_REACT_DASHBOARD.md) | React + Plotly dashboard, dark/light theme | Hassan |
 | 7 | [07_GIT_WORKFLOW.md](07_GIT_WORKFLOW.md) | Branches, pull requests, team rules | Both |
 | 8 | [08_HANDOVER_TO_MUDASSAR.md](08_HANDOVER_TO_MUDASSAR.md) | Interfaces for Airflow, Kubeflow and Kubernetes | Hassan → Mudassar |
+| 9 | [09_AIRFLOW_ETL_DAG.md](09_AIRFLOW_ETL_DAG.md) | Daily Airflow DAG: fetch → features → train → reload (Part C1) | Mudassar |
+| 10 | [10_KUBEFLOW_PIPELINE.md](10_KUBEFLOW_PIPELINE.md) | KFP v2 container components, compiled YAML (Part C2) | Mudassar |
+| 11 | [11_KUBERNETES.md](11_KUBERNETES.md) | Minikube deploy, HPA load test, Ingress, self-healing (Part D, E1, E2) | Mudassar |
 
 Evidence for the report:
 

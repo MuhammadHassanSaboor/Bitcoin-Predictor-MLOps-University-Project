@@ -42,6 +42,7 @@ models/                  registered model: model.pkl, metrics.json, model_versio
 dags/                    Airflow DAG: btc_etl_pipeline.py
 kubeflow/                Kubeflow pipeline: btc_kfp_pipeline.py (+ compiled YAML)
 k8s/                     Kubernetes manifests
+loadtest/                Locust load test for the HPA demo
 .github/workflows/       ci_cd.yml
 docker-compose.yml       API + UI + Airflow + Postgres for local integration
 Docs/                    roadmap, step-by-step docs, screenshots, logs
