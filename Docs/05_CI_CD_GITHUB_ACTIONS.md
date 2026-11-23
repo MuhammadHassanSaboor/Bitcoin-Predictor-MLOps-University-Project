@@ -8,7 +8,7 @@ File: [`.github/workflows/ci_cd.yml`](../.github/workflows/ci_cd.yml)
 |---|---|
 | Pull Request into `main` | Lint + tests + React build + Docker **build** (no push) |
 | Push / merge into `main` | Everything above + Docker **push** to Docker Hub |
-| Manual (*Actions → CI/CD → Run workflow*) | Same as the branch it runs on |
+| Manual (*Actions → CI/CD → Run workflow*, branch `main`) | Everything, including the Docker **push** |
 
 ## Pipeline
 
@@ -46,6 +46,12 @@ File: [`.github/workflows/ci_cd.yml`](../.github/workflows/ci_cd.yml)
    so the links can be submitted and Kubernetes can pull the images without credentials.
 
 The secrets are never printed in the logs; GitHub masks them automatically.
+
+### Merged before adding the secrets?
+
+The CD job needs the secrets at the moment it runs. If a PR was merged before they were added, either
+open the next PR and merge it, or run the workflow by hand:
+*Actions → CI/CD → Run workflow → Branch: main → Run workflow*. Both push the images.
 
 ## Run the same checks locally before pushing
 

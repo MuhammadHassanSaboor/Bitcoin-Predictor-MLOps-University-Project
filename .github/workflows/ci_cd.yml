@@ -2,7 +2,7 @@ name: CI/CD
 
 # CI  : lint (flake8 + black) and unit tests (pytest) on every push to main and every PR.
 # CD  : build the API + UI Docker images and push them to Docker Hub
-#       (tags: latest and the git commit SHA) - only for pushes to main.
+#       (tags: latest and the git commit SHA) - for pushes to main and manual runs on main.
 on:
   push:
     branches: [main]
@@ -91,7 +91,8 @@ jobs:
             context: frontend
             dockerfile: frontend/Dockerfile
     env:
-      PUSH: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      # Push on merges to main and on manual runs of main; never from pull requests.
+      PUSH: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
       IMAGE: ${{ secrets.DOCKER_USERNAME || 'local' }}/${{ matrix.image }}
     steps:
       - name: Checkout
