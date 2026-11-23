@@ -1,0 +1,4 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+POST,/predict,CatchResponseError('status 0'),186,2026-11-23T22:34:11Z,2026-11-23T22:39:01Z
+GET,/health,RemoteDisconnected('Remote end closed connection without response'),67,2026-11-23T22:34:09Z,2026-11-23T22:39:00Z
+GET,/metrics,RemoteDisconnected('Remote end closed connection without response'),34,2026-11-23T22:34:41Z,2026-11-23T22:39:01Z

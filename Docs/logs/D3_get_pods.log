@@ -1,0 +1,12 @@
+$ kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+btc-forecast-api   3/3     3            3           5m35s
+btc-forecast-ui    2/2     2            2           5m35s
+
+$ kubectl get pods -o wide
+NAME                                READY   STATUS    RESTARTS   AGE     IP            NODE       NOMINATED NODE   READINESS GATES
+btc-forecast-api-76b9d878cd-8g6fn   1/1     Running   0          5m35s   10.244.0.9    minikube   <none>           <none>
+btc-forecast-api-76b9d878cd-8szds   1/1     Running   0          5m35s   10.244.0.10   minikube   <none>           <none>
+btc-forecast-api-76b9d878cd-qs2pj   1/1     Running   0          5m35s   10.244.0.11   minikube   <none>           <none>
+btc-forecast-ui-959c84d85-c7qln     1/1     Running   0          5m35s   10.244.0.7    minikube   <none>           <none>
+btc-forecast-ui-959c84d85-m66zs     1/1     Running   0          5m35s   10.244.0.8    minikube   <none>           <none>

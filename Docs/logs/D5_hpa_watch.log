@@ -1,0 +1,29 @@
+$ kubectl get hpa btc-forecast-api --watch   (Locust: 100 users, 03:34:20 - 03:39:20)
+NAME               REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 1%/60%   2         8         2          22m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 20%/60%   2         8         2          22m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 462%/60%   2         8         2          23m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 462%/60%   2         8         4          24m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 462%/60%   2         8         6          24m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 499%/60%   2         8         6          24m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 499%/60%   2         8         8          25m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 328%/60%   2         8         8          25m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 302%/60%   2         8         8          26m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 246%/60%   2         8         8          27m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 8%/60%     2         8         8          28m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 1%/60%     2         8         8          29m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 1%/60%     2         8         8          30m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 1%/60%     2         8         7          30m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 1%/60%     2         8         7          31m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 1%/60%     2         8         6          31m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 1%/60%     2         8         5          31m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 1%/60%     2         8         5          32m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 1%/60%     2         8         4          32m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 2%/60%     2         8         3          32m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 2%/60%     2         8         3          33m
+btc-forecast-api   Deployment/btc-forecast-api   cpu: 2%/60%     2         8         2          33m
+
+$ kubectl get pods -l app=btc-forecast-api   # after scale-down
+NAME                                READY   STATUS    RESTARTS   AGE
+btc-forecast-api-75f9549999-7wmfp   1/1     Running   0          15m
+btc-forecast-api-75f9549999-m72d8   1/1     Running   0          15m

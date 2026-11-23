@@ -1,0 +1,21 @@
+$ kubectl get nodes -o wide
+NAME       STATUS   ROLES           AGE     VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION                              CONTAINER-RUNTIME
+minikube   Ready    control-plane   6m26s   v1.37.0   192.168.49.2   <none>        Debian GNU/Linux 12 (bookworm)   6.18.40.1-microsoft-standard-WSL2 (amd64)   containerd://2.3.4
+
+$ minikube addons list (enabled)
+│         ADDON NAME          │ PROFILE  │   STATUS   │               MAINTAINER               │
+│ default-storageclass        │ minikube │ enabled ✅ │ Kubernetes                             │
+│ metrics-server              │ minikube │ enabled ✅ │ Kubernetes                             │
+│ storage-provisioner         │ minikube │ enabled ✅ │ minikube                               │
+
+$ kubectl apply -f k8s/
+configmap/btc-api-config created
+secret/btc-api-secret created
+deployment.apps/btc-forecast-api created
+deployment.apps/btc-forecast-ui created
+service/btc-forecast-ui created
+horizontalpodautoscaler.autoscaling/btc-forecast-api created
+persistentvolumeclaim/btc-models-pvc created
+service/btc-forecast-api created
+service/btc-forecast-nodeport created
+Error from server (InternalError): error when creating "k8s\\ingress.yaml": Internal error occurred: failed calling webhook "validate.nginx.ingress.kubernetes.io": failed to call webhook: Post "https://ingress-nginx-controller-admission.ingress-nginx.svc:443/networking/v1/ingresses?timeout=10s": dial tcp 10.96.172.44:443: connect: connection refused
