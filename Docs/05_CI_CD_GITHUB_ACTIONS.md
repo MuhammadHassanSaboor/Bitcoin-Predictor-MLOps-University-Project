@@ -71,10 +71,31 @@ cd frontend; npm run build; cd ..
 | `pyproject.toml` | black line length 100 + pytest settings |
 | `requirements-dev.txt` | pinned versions of pytest / flake8 / black |
 
-## Screenshots for the report
+## Published images (deliverable)
 
-Take these from github.com after the PR / merge:
+| Image | Link | Tags |
+|---|---|---|
+| API | https://hub.docker.com/r/hassansaboor/btc-forecast-api | `latest`, `<git SHA>` |
+| UI | https://hub.docker.com/r/hassansaboor/btc-forecast-ui | `latest`, `<git SHA>` |
 
-- `Docs/screenshots/part-B_docker-cicd/B3_actions_pr_checks.png`: PR page showing all checks ✔
-- `Docs/screenshots/part-B_docker-cicd/B3_actions_run_jobs.png`: *Actions* tab → the run → job graph
-- `Docs/screenshots/part-B_docker-cicd/B4_dockerhub_tags.png`: Docker Hub → repo → *Tags* (`latest` + SHA)
+```powershell
+docker pull hassansaboor/btc-forecast-api:latest
+docker pull hassansaboor/btc-forecast-ui:latest
+```
+
+## Evidence
+
+| | |
+|---|---|
+| CI/CD run on `main` (all jobs green) | ![](screenshots/part-B_docker-cicd/B3_actions_run_jobs.png) |
+| Workflow history | ![](screenshots/part-B_docker-cicd/B3_actions_history.png) |
+| Pull request merged, checks passed | ![](screenshots/part-B_docker-cicd/B3_actions_pr_checks.png) |
+| Docker Hub tags (API) | ![](screenshots/part-B_docker-cicd/B4_dockerhub_tags.png) |
+| Docker Hub tags (UI) | ![](screenshots/part-B_docker-cicd/B4_dockerhub_ui_tags.png) |
+
+## Troubleshooting we hit
+
+| Error in the Docker job | Cause | Fix |
+|---|---|---|
+| `401 Unauthorized: access token has insufficient scopes` | Docker Hub token was **Read-only** | New token with **Read & Write**, update `DOCKER_PASSWORD`, re-run |
+| Images not pushed after the first merge | Secrets were added after the merge | *Actions → CI/CD → Run workflow* on `main` |

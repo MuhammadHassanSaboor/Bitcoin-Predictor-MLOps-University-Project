@@ -57,8 +57,8 @@ After the PR is merged into `main`, GitHub Actions pushes:
 
 | Image | Port | Notes |
 |---|---|---|
-| `<dockerhub-user>/btc-forecast-api:latest` (also `:<git-sha>`) | 5000 | Flask + Gunicorn, runs as uid **1000** |
-| `<dockerhub-user>/btc-forecast-ui:latest` | 8080 | React + Nginx, runs as uid 101 |
+| `hassansaboor/btc-forecast-api:latest` (also `:<git-sha>`) | 5000 | Flask + Gunicorn, runs as uid **1000** |
+| `hassansaboor/btc-forecast-ui:latest` | 8080 | React + Nginx, runs as uid 101 |
 
 The API image also contains `src/` and all ML libraries, so **Kubeflow components can use it** as their
 base image, e.g. `python -c "from src.etl_fetch import main; print(main())"`.

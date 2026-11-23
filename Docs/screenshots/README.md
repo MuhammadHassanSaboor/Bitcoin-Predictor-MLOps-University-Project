@@ -33,8 +33,11 @@ Terminal screenshots are rendered from the exact command and output captured whi
 | `part-B_docker-cicd/B1_non_root_user.png` | B1 · container runs as `appuser`, not root |
 | `part-B_docker-cicd/B2_compose_ps.png` | B2 · `docker compose ps`: API, UI, Airflow, Postgres running |
 | `part-B_docker-cicd/B2_airflow_ui.png` | B2 · Airflow web UI running from compose |
-| `part-B_docker-cicd/B3_actions_pr_checks.png` | B3 · *(take after opening the PR)* lint + tests green |
-| `part-B_docker-cicd/B4_dockerhub_tags.png` | B4 · *(take after merging)* Docker Hub tags `latest` + SHA |
+| `part-B_docker-cicd/B3_actions_run_jobs.png` | B3/B4 · CI/CD run on `main`: lint & tests → React build → Docker build & push (all green) |
+| `part-B_docker-cicd/B3_actions_history.png` | B3 · Actions history: workflow runs on PRs and on `main` |
+| `part-B_docker-cicd/B3_actions_pr_checks.png` | B3 · Pull request merged with all checks passed |
+| `part-B_docker-cicd/B4_dockerhub_tags.png` | B4 · Docker Hub `hassansaboor/btc-forecast-api`: tags `latest` + commit SHA |
+| `part-B_docker-cicd/B4_dockerhub_ui_tags.png` | B4 · Docker Hub `hassansaboor/btc-forecast-ui`: tags `latest` + commit SHA |
 
 ## React dashboard (extra)
 
