@@ -70,10 +70,32 @@ def btc_etl_pipeline():
 
     @task(execution_timeout=timedelta(minutes=45))
     def train_and_evaluate(features: dict) -> dict:
-        from src.train_forecast import main
+        import json
+        import subprocess
+        import sys
 
-        # tune=False re-uses models/best_params.json, so the daily run takes ~2 minutes
-        result = main(tune=False)
+        # Train in a clean Python process, not inside the Airflow worker:
+        #  - Airflow imports `dill`, which patches the pure-Python pickler that joblib uses,
+        #    so a model saved here would need dill to load and the API (no dill) would fail.
+        #  - sklearn/joblib can only use all CPU cores outside the forked task process.
+        # tune=False re-uses models/best_params.json, so the daily run takes a few minutes.
+        script = (
+            "import json, logging; from src.train_forecast import main; "
+            "logging.basicConfig(level=logging.INFO, "
+            "format='%(asctime)s %(levelname)s %(name)s: %(message)s'); "
+            "print('RESULT=' + json.dumps(main(tune=False)))"
+        )
+        proc = subprocess.run(
+            [sys.executable, "-c", script], capture_output=True, text=True, check=False
+        )
+        for line in (proc.stderr + proc.stdout).splitlines():
+            if "UserWarning" not in line and not line.startswith("RESULT="):
+                log.info(line)
+        if proc.returncode != 0:
+            raise RuntimeError(f"Training process exited with code {proc.returncode}")
+        result = json.loads(
+            next(ln for ln in proc.stdout.splitlines() if ln.startswith("RESULT="))[7:]
+        )
         log.info(
             "Model %s (%s): MAE=%.2f RMSE=%.2f MAPE=%.3f%% registered=%s",
             result["model_version"],
