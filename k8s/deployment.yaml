@@ -48,21 +48,25 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+          # Under heavy load /health waits behind CPU-bound /predict calls in the single
+          # Gunicorn worker. Generous timeouts stop the liveness probe from restarting
+          # pods that are only busy (which would push their load onto the others);
+          # a truly frozen container is still restarted after ~60s.
           livenessProbe: # restart a frozen container
             httpGet:
               path: /health
               port: http
             initialDelaySeconds: 15
             periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
+            timeoutSeconds: 10
+            failureThreshold: 6
           readinessProbe: # only send traffic once the app answers
             httpGet:
               path: /health
               port: http
             initialDelaySeconds: 5
             periodSeconds: 5
-            timeoutSeconds: 3
+            timeoutSeconds: 5
             failureThreshold: 3
           securityContext:
             allowPrivilegeEscalation: false

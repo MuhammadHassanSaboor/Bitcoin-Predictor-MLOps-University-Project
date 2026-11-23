@@ -17,7 +17,8 @@ from locust import HttpUser, between, task
 
 
 class ForecastUser(HttpUser):
-    wait_time = between(0.1, 0.5)
+    # Each user thinks 1-3 s between calls, like a real dashboard user.
+    wait_time = between(1, 3)
 
     @task(6)
     def predict(self):
