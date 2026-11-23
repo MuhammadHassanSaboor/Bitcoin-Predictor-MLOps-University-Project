@@ -1,0 +1,14 @@
+[2026-11-23 13:24:11 +0000] [1] [INFO] Starting gunicorn 23.0.0
+[2026-11-23 13:24:11 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+[2026-11-23 13:24:11 +0000] [1] [INFO] Using worker: gthread
+[2026-11-23 13:24:11 +0000] [7] [INFO] Booting worker with pid: 7
+[2026-11-23 13:24:11 +0000] [8] [INFO] Booting worker with pid: 8
+2026-11-23 13:24:15,967 INFO btc-api: Loaded model v20261123-1217 (Ensemble (XGBoost + Random Forest))
+2026-11-23 13:24:16,024 INFO btc-api: Loaded model v20261123-1217 (Ensemble (XGBoost + Random Forest))
+127.0.0.1 - - [23/Nov/2026:13:24:16 +0000] "GET /health HTTP/1.1" 200 183 "-" "Python-urllib/3.10"
+172.18.0.1 - - [23/Nov/2026:13:24:19 +0000] "GET /health HTTP/1.1" 200 183 "-" "curl/8.11.0"
+172.18.0.1 - - [23/Nov/2026:13:24:46 +0000] "GET /health HTTP/1.1" 200 184 "-" "curl/8.11.0"
+127.0.0.1 - - [23/Nov/2026:13:24:47 +0000] "GET /health HTTP/1.1" 200 184 "-" "Python-urllib/3.10"
+172.18.0.1 - - [23/Nov/2026:13:24:47 +0000] "POST /predict HTTP/1.1" 200 1014 "-" "curl/8.11.0"
+172.18.0.1 - - [23/Nov/2026:13:24:48 +0000] "POST /predict HTTP/1.1" 200 1014 "-" "curl/8.11.0"
+172.18.0.1 - - [23/Nov/2026:13:24:48 +0000] "GET /metrics HTTP/1.1" 200 2918 "-" "curl/8.11.0"

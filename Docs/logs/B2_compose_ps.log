@@ -1,0 +1,6 @@
+NAME                    IMAGE                              STATUS                   PORTS
+btc-airflow-scheduler   apache/airflow:2.10.4-python3.10   Up 3 minutes (healthy)   8080/tcp
+btc-airflow-webserver   apache/airflow:2.10.4-python3.10   Up 3 minutes (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+btc-api                 local/btc-forecast-api:latest      Up 2 minutes (healthy)   0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp
+btc-postgres            postgres:16-alpine                 Up 4 minutes (healthy)   5432/tcp
+btc-ui                  local/btc-forecast-ui:latest       Up 2 minutes (healthy)   0.0.0.0:3000->8080/tcp, [::]:3000->8080/tcp
