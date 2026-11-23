@@ -1,0 +1,213 @@
+{
+  "model_version": "v20261123-1217",
+  "model_name": "Ensemble (XGBoost + Random Forest)",
+  "trained_at": "2026-11-23T12:17:57+00:00",
+  "data_last_date": "2026-11-22",
+  "training_rows": 3546,
+  "mae": 3316.91,
+  "rmse": 3957.74,
+  "mape": 5.468,
+  "direction_accuracy": 14.3,
+  "test_window": {
+    "origin_date": "2026-11-15",
+    "origin_close": 65305.06,
+    "dates": [
+      "2026-11-16",
+      "2026-11-17",
+      "2026-11-18",
+      "2026-11-19",
+      "2026-11-20",
+      "2026-11-21",
+      "2026-11-22"
+    ],
+    "actual": [
+      64855.84,
+      64893.95,
+      62987.27,
+      61901.82,
+      58798.98,
+      60094.09,
+      61161.91
+    ],
+    "predicted": [
+      65366.15,
+      65373.73,
+      65481.04,
+      65446.78,
+      65338.73,
+      65640.94,
+      65264.83
+    ],
+    "naive": [
+      65305.06,
+      65305.06,
+      65305.06,
+      65305.06,
+      65305.06,
+      65305.06,
+      65305.06
+    ]
+  },
+  "baseline_naive": {
+    "mae": 3205.94,
+    "rmse": 3854.02,
+    "mape": 5.288
+  },
+  "cv": {
+    "method": "walk-forward, 6 folds x 60 days, 7-day purge gap",
+    "mape": 3.1292,
+    "naive_mape": 3.1184
+  },
+  "leaderboard": [
+    {
+      "model": "Naive (last price)",
+      "family": "naive",
+      "cv_mape": 3.1184,
+      "params": {}
+    },
+    {
+      "model": "Ensemble (XGBoost + Random Forest)",
+      "family": "ensemble_top2",
+      "cv_mape": 3.1292,
+      "params": {
+        "members": [
+          {
+            "family": "xgboost",
+            "params": {
+              "train_window": null,
+              "subsample": 1.0,
+              "reg_lambda": 10,
+              "objective": "reg:absoluteerror",
+              "n_estimators": 150,
+              "min_child_weight": 5,
+              "max_depth": 4,
+              "learning_rate": 0.01,
+              "colsample_bytree": 0.8
+            }
+          },
+          {
+            "family": "random_forest",
+            "params": {
+              "train_window": 730,
+              "n_estimators": 300,
+              "min_samples_leaf": 100,
+              "max_features": 0.3,
+              "max_depth": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "model": "Ensemble (XGBoost + Random Forest + Ridge Regression)",
+      "family": "ensemble_top3",
+      "cv_mape": 3.1344,
+      "params": {
+        "members": [
+          {
+            "family": "xgboost",
+            "params": {
+              "train_window": null,
+              "subsample": 1.0,
+              "reg_lambda": 10,
+              "objective": "reg:absoluteerror",
+              "n_estimators": 150,
+              "min_child_weight": 5,
+              "max_depth": 4,
+              "learning_rate": 0.01,
+              "colsample_bytree": 0.8
+            }
+          },
+          {
+            "family": "random_forest",
+            "params": {
+              "train_window": 730,
+              "n_estimators": 300,
+              "min_samples_leaf": 100,
+              "max_features": 0.3,
+              "max_depth": null
+            }
+          },
+          {
+            "family": "ridge",
+            "params": {
+              "train_window": 730,
+              "alpha": 1000
+            }
+          }
+        ]
+      }
+    },
+    {
+      "model": "XGBoost",
+      "family": "xgboost",
+      "cv_mape": 3.1402,
+      "params": {
+        "train_window": null,
+        "subsample": 1.0,
+        "reg_lambda": 10,
+        "objective": "reg:absoluteerror",
+        "n_estimators": 150,
+        "min_child_weight": 5,
+        "max_depth": 4,
+        "learning_rate": 0.01,
+        "colsample_bytree": 0.8
+      }
+    },
+    {
+      "model": "Random Forest",
+      "family": "random_forest",
+      "cv_mape": 3.1432,
+      "params": {
+        "train_window": 730,
+        "n_estimators": 300,
+        "min_samples_leaf": 100,
+        "max_features": 0.3,
+        "max_depth": null
+      }
+    },
+    {
+      "model": "Ridge Regression",
+      "family": "ridge",
+      "cv_mape": 3.1502,
+      "params": {
+        "train_window": 730,
+        "alpha": 1000
+      }
+    },
+    {
+      "model": "Extra Trees",
+      "family": "extra_trees",
+      "cv_mape": 3.1515,
+      "params": {
+        "train_window": 730,
+        "n_estimators": 300,
+        "min_samples_leaf": 100,
+        "max_features": 0.3,
+        "max_depth": null
+      }
+    },
+    {
+      "model": "LightGBM",
+      "family": "lightgbm",
+      "cv_mape": 3.1684,
+      "params": {
+        "train_window": 1460,
+        "subsample_freq": 1,
+        "subsample": 0.9,
+        "reg_lambda": 20,
+        "objective": "l1",
+        "num_leaves": 4,
+        "n_estimators": 300,
+        "min_child_samples": 60,
+        "learning_rate": 0.01,
+        "colsample_bytree": 0.5
+      }
+    }
+  ],
+  "threshold": {
+    "mape_max": 10.0,
+    "passed": true
+  },
+  "registered": true
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "version": "v20261123-1157",
+    "model_name": "Ensemble (Random Forest + Ridge Regression)",
+    "trained_at": "2026-11-23T11:57:41+00:00",
+    "test_mape": 4.697,
+    "cv_mape": 3.1431,
+    "registered": true
+  },
+  {
+    "version": "v20261123-1205",
+    "model_name": "Ensemble (XGBoost + Random Forest)",
+    "trained_at": "2026-11-23T12:05:48+00:00",
+    "test_mape": 5.306,
+    "cv_mape": 3.1184,
+    "registered": true
+  },
+  {
+    "version": "v20261123-1217",
+    "model_name": "Ensemble (XGBoost + Random Forest)",
+    "trained_at": "2026-11-23T12:17:57+00:00",
+    "test_mape": 5.468,
+    "cv_mape": 3.1292,
+    "registered": true
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "xgboost": {
+    "train_window": null,
+    "subsample": 1.0,
+    "reg_lambda": 10,
+    "objective": "reg:absoluteerror",
+    "n_estimators": 150,
+    "min_child_weight": 5,
+    "max_depth": 4,
+    "learning_rate": 0.01,
+    "colsample_bytree": 0.8
+  },
+  "random_forest": {
+    "train_window": 730,
+    "n_estimators": 300,
+    "min_samples_leaf": 100,
+    "max_features": 0.3,
+    "max_depth": null
+  },
+  "ridge": {
+    "train_window": 730,
+    "alpha": 1000
+  },
+  "extra_trees": {
+    "train_window": 730,
+    "n_estimators": 300,
+    "min_samples_leaf": 100,
+    "max_features": 0.3,
+    "max_depth": null
+  },
+  "lightgbm": {
+    "train_window": 1460,
+    "subsample_freq": 1,
+    "subsample": 0.9,
+    "reg_lambda": 20,
+    "objective": "l1",
+    "num_leaves": 4,
+    "n_estimators": 300,
+    "min_child_samples": 60,
+    "learning_rate": 0.01,
+    "colsample_bytree": 0.5
+  }
+}

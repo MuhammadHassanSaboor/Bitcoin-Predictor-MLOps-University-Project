@@ -221,3 +221,37 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---- Project specific ----
+# Secrets / local settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+kubeconfig*
+
+# Downloaded data (re-created by src/etl_fetch.py)
+data/
+
+# Model folder: only the registered model files are committed
+models/*
+!models/model.pkl
+!models/metrics.json
+!models/model_version.txt
+!models/best_params.json
+!models/registry.json
+
+# Frontend
+node_modules/
+frontend/dist/
+
+# Local tooling
+.claude/
+.vscode/
+.idea/
+*.log
+!Docs/logs/*.log
+
+# Course material (not ours to publish)
+Docs/Assignment Problem Statement.pdf
