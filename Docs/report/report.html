@@ -18,6 +18,22 @@
   a { color: #b45f06; text-decoration: none; }
   .page-break { break-before: page; }
   .subtitle { color: #4b5768; font-size: 10.5pt; margin-bottom: 4mm; }
+  .cover { margin: 0 0 3mm; border: 1px solid #dde3ea; border-radius: 2.5mm; overflow: hidden; break-inside: avoid; }
+  .cover-band { position: relative; background: linear-gradient(120deg, #0b1220 0%, #16233a 100%); color: #fff; padding: 5mm 7mm 4.5mm; border-bottom: 1.2mm solid #f7931a; }
+  .eyebrow { font-size: 7.6pt; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #f7b155; margin-bottom: 2mm; }
+  .cover h1 { font-size: 23pt; line-height: 1.1; margin: 0 0 1.6mm; color: #fff; letter-spacing: -0.015em; }
+  .cover-sub { font-size: 10pt; color: #c3cddb; max-width: 150mm; }
+  .cover-info { display: grid; grid-template-columns: 1.3fr 1.3fr 1.1fr; background: #f8fafc; }
+  .ci { padding: 2.5mm 4.5mm; border-right: 1px solid #e3e8ef; font-size: 8.6pt; }
+  .ci:last-child { border-right: 0; white-space: nowrap; }
+  .ci-label { font-size: 7pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #8592a6; margin-bottom: 1.4mm; }
+  .member { display: flex; justify-content: space-between; gap: 3mm; padding: .5mm 0; }
+  .mname { font-weight: 600; color: #0e1726; white-space: nowrap; }
+  .roll { font-family: Consolas, monospace; color: #475569; white-space: nowrap; }
+  .note { border-left: 3px solid #6366f1; background: #eef2ff; color: #312e81; border-radius: 0 1.5mm 1.5mm 0; padding: 1.8mm 3mm; margin: 0 0 3mm; font-size: 8.5pt; }
+  table.compact { font-size: 7.9pt; }
+  table.compact td, table.compact th { padding: .7mm 1.6mm; }
+  table.compact code { font-size: 7.6pt; padding: 0 .6mm; }
   .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5mm 8mm; padding: 3mm 4mm; background: #f7f9fc; border: 1px solid #e3e8ef; border-radius: 2mm; margin-bottom: 3mm; }
   .meta b { color: #0e1726; }
   table { width: 100%; border-collapse: collapse; margin: 1mm 0 2.5mm; font-size: 8.7pt; break-inside: avoid; }
@@ -44,15 +60,32 @@
 <body>
 
 <!-- ============================================================ PAGE 1 -->
-<h1>Bitcoin 7-Day Price Forecast: Production MLOps Pipeline</h1>
-<div class="subtitle">MLOps Assignment 3 · Microservices, ETL, Orchestration &amp; Kubernetes Deployment · Technical Report</div>
+<header class="cover">
+  <div class="cover-band">
+    <div class="eyebrow">MLOps &middot; Assignment 3 &middot; Technical Report</div>
+    <h1>Bitcoin 7-Day Price Forecast</h1>
+    <div class="cover-sub">Production MLOps Pipeline: Microservices, ETL, Orchestration &amp; Kubernetes Deployment</div>
+  </div>
+  <div class="cover-info">
+    <div class="ci">
+      <div class="ci-label">Group members</div>
+      <div class="member"><span class="mname">Muhammad Hassan Saboor</span><span class="roll">25L-8014</span></div>
+      <div class="member"><span class="mname">Mudassar Zulfiqar</span><span class="roll">24L-8000</span></div>
+    </div>
+    <div class="ci">
+      <div class="ci-label">Source code</div>
+      <a href="https://github.com/MuhammadHassanSaboor/Bitcoin-Predictor-MLOps-University-Project">github.com/MuhammadHassanSaboor/<br>Bitcoin-Predictor-MLOps-University-Project</a>
+    </div>
+    <div class="ci">
+      <div class="ci-label">Docker images</div>
+      <a href="https://hub.docker.com/r/hassansaboor/btc-forecast-api">hassansaboor/btc-forecast-api</a><br>
+      <a href="https://hub.docker.com/r/hassansaboor/btc-forecast-ui">hassansaboor/btc-forecast-ui</a>
+    </div>
+  </div>
+</header>
 
-<div class="meta">
-  <div><b>Muhammad Hassan Saboor</b> · 25L-8014<br><span class="small">Data &amp; ML model, Flask API, React UI, Docker, CI/CD</span></div>
-  <div><b>Mudassar Zulfiqar</b> · 24L-8000<br><span class="small">Airflow ETL, Kubeflow pipeline, Kubernetes, load &amp; chaos testing</span></div>
-  <div><b>GitHub:</b> <a href="https://github.com/MuhammadHassanSaboor/Bitcoin-Predictor-MLOps-University-Project">github.com/MuhammadHassanSaboor/Bitcoin-Predictor-MLOps-University-Project</a></div>
-  <div><b>Docker Hub:</b> <a href="https://hub.docker.com/r/hassansaboor/btc-forecast-api">hassansaboor/btc-forecast-api</a> · <a href="https://hub.docker.com/r/hassansaboor/btc-forecast-ui">hassansaboor/btc-forecast-ui</a></div>
-</div>
+<div class="note"><b>Note on AI assistance:</b> We used Claude (an AI assistant by Anthropic) only to help write some parts
+of the code and to improve the formatting of this PDF report.</div>
 
 <p>The system ingests daily BTC-USD prices, retrains a forecasting model every day, and serves the
 closing-price forecast for the next 7 days through a Flask REST API and a React dashboard. Every
@@ -61,7 +94,7 @@ equivalent Kubeflow pipeline), and deployed on Kubernetes (Minikube) with probes
 autoscaling and an NGINX Ingress.</p>
 
 <h2>1. Architecture</h2>
-<svg viewBox="0 0 760 300" width="100%" style="height:66mm" role="img" aria-label="System architecture diagram">
+<svg viewBox="0 0 760 300" width="100%" style="height:61mm" role="img" aria-label="System architecture diagram">
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
   </defs>
@@ -110,12 +143,12 @@ autoscaling and an NGINX Ingress.</p>
 </svg>
 
 <h3>Repository structure (as required)</h3>
-<table style="font-size:8.2pt">
+<table class="compact">
   <tr><th>Path</th><th>Purpose</th><th>Path</th><th>Purpose</th></tr>
-  <tr><td><code>app/app.py</code>, <code>app/Dockerfile</code></td><td>Flask API, multi-stage image</td><td><code>k8s/*.yaml</code></td><td>ConfigMap/Secret, PVC, Deployment, Services, HPA, Ingress, UI</td></tr>
-  <tr><td><code>src/etl_fetch.py</code>, <code>src/train_forecast.py</code></td><td>ETL and training (+ <code>features.py</code>, <code>forecaster.py</code>)</td><td><code>.github/workflows/ci_cd.yml</code></td><td>Lint, test, build, push</td></tr>
+  <tr><td><code>app/app.py</code>, <code>app/Dockerfile</code></td><td>Flask API, multi-stage image</td><td><code>k8s/*.yaml</code></td><td>ConfigMap/Secret, PVC, Deployment, Service, HPA, Ingress</td></tr>
+  <tr><td><code>src/etl_fetch.py</code>, <code>src/train_forecast.py</code></td><td>ETL and training</td><td><code>.github/workflows/ci_cd.yml</code></td><td>Lint, test, build, push</td></tr>
   <tr><td><code>dags/btc_etl_pipeline.py</code></td><td>Airflow daily DAG</td><td><code>docker-compose.yml</code></td><td>API + UI + Airflow + Postgres</td></tr>
-  <tr><td><code>kubeflow/btc_kfp_pipeline.py</code> (+ YAML)</td><td>Kubeflow pipeline, compiled spec</td><td><code>tests/</code>, <code>loadtest/</code>, <code>frontend/</code></td><td>pytest, Locust, React dashboard</td></tr>
+  <tr><td><code>kubeflow/btc_kfp_pipeline.py</code></td><td>KFP pipeline (+ compiled YAML)</td><td><code>tests/</code>, <code>loadtest/</code>, <code>frontend/</code></td><td>pytest, Locust, React dashboard</td></tr>
 </table>
 
 <h3>Forecasting model</h3>
