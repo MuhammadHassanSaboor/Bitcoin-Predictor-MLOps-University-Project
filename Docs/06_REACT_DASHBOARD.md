@@ -1,26 +1,45 @@
-# 06 · React Dashboard (extra feature)
+# 06 · React Dashboard: BTC Forecast Terminal (extra feature)
 
-A stock-market style web app on top of the Flask API. It is built with **React 18 + Vite**,
-the charts use **Plotly**, and it has a **dark / light theme** switch.
+A trading-terminal style web app on top of the Flask API, built with **React 18 + Vite** and
+**Plotly** charts. It has four pages, a live market feed, and a **dark / light theme**.
 
-![Dashboard (dark)](screenshots/react-dashboard/dashboard_dark.png)
+![Terminal (dark)](screenshots/react-dashboard/terminal_dark.png)
 
-## Features
+## Layout
 
-| Area | What it shows | Data source |
-|---|---|---|
-| Navbar | Live BTC/USD price (flashes green/red on every tick), 24h change, UTC clock, API status, model version, 🌙/☀️ theme button | Binance WebSocket (fallback: Coinbase REST) + `GET /health` |
-| Ticker tape | Scrolling 24h high/low/volume, last daily close, 7-day change, next-day & 7-day forecast, model MAPE | live feed + API |
-| Price chart | Candlesticks or line, MA 7, MA 30, volume bars, 7-day forecast with 80% range, live price marker; 1M/3M/6M/1Y/MAX ranges, zoom/pan | `GET /history`, `POST /predict` |
-| Forecast panel | Choose 1–7 days, run the forecast, target price headline, table with daily change bars | `POST /predict` |
-| KPI cards | MAE, RMSE, MAPE (vs naive baseline), walk-forward CV MAPE, direction hit-rate, threshold pass/fail | `GET /metrics` |
-| Backtest chart | Latest 7-day test window: actual vs model vs naive | `GET /metrics` |
-| Model leaderboard | Every model family tried, ranked by CV MAPE | `GET /metrics` |
-| What-if simulator | Move the latest price by ±30% over 1–14 days and see how the forecast reacts | `POST /predict` with a custom `history` |
-| Live market | Real-time tick chart + which pod served the request + API uptime | live feed + `GET /health` |
+```
+┌ Top bar ─ brand · Terminal | Model | Scenario Lab | API · model version · API status · theme ┐
+├ Market bar ─ BTC/USD live price · 24h high/low/volume · last close · next-day / 7-day forecast · signal ┤
+│                                                                                              │
+│                         page content (one of the four pages below)                           │
+│                                                                                              │
+└ Status bar ─ connection · API latency · serving pod · stage · uptime · feed · last sync · UTC ┘
+```
 
-The page refreshes API data every 60 s and re-runs the forecast automatically when the
-model version changes (for example after Airflow retrains the model).
+## Pages
+
+| Page | URL | What it shows | API calls |
+|---|---|---|---|
+| **Terminal** | `#/` | Candlestick / line / area chart with MA 7, MA 30, volume, the 7-day forecast and its 80% band in a shaded *forecast zone*, a live-price tag on the axis, and an OHLC readout. Side panel: horizon 1–7 days, target price, bullish/neutral/bearish signal meter, 80% range. Bottom tabs: forecast table (with range bars), latest backtest, live tick chart | `GET /history`, `POST /predict` |
+| **Model** | `#/model` | KPIs (MAE, RMSE, MAPE, CV MAPE vs naive, direction hit-rate, training rows), model card, backtest chart, model leaderboard, day-by-day test-window table | `GET /metrics` |
+| **Scenario Lab** | `#/scenario` | Move the last price by ±30% over 1–14 days (or pick a preset: Crash, Sell-off, Dip, Flat, Rally, Breakout) and compare the scenario forecast with the base forecast | `POST /predict` with a custom `history` |
+| **API** | `#/api` | Live API console: pick an endpoint, edit the JSON body, press **Send**, see status code, latency and the highlighted JSON response, plus the matching `curl` command | all endpoints |
+
+The data refreshes every 60 s. When the model version changes (after the Airflow DAG retrains), the
+forecast is re-run automatically.
+
+**Live market feed:** Binance WebSocket (`btcusdt@ticker`, one update per second); if that is blocked,
+Coinbase REST is polled every 5 s.
+
+## Screenshots
+
+| | |
+|---|---|
+| Terminal (light) | ![](screenshots/react-dashboard/terminal_light.png) |
+| Model (dark) | ![](screenshots/react-dashboard/model_dark.png) |
+| Scenario Lab (light) | ![](screenshots/react-dashboard/scenario_light.png) |
+| API console (dark) | ![](screenshots/react-dashboard/api_console_dark.png) |
+| Mobile | ![](screenshots/react-dashboard/mobile_dark.png) |
 
 ## Folder layout
 
@@ -32,18 +51,20 @@ frontend/
 ├── index.html
 ├── package.json / package-lock.json
 └── src/
-    ├── main.jsx             entry point
-    ├── App.jsx              page layout + data loading
-    ├── api.js               fetch helpers + number formatting
-    ├── styles.css           design tokens (dark/light) + layout
+    ├── main.jsx · App.jsx   entry point, data loading, page switching
+    ├── api.js               API client (with latency), formatting helpers, signal
+    ├── styles.css           design tokens (dark/light) + all layout
     ├── hooks/
-    │   ├── useTheme.js      theme state (saved in localStorage) + Plotly colours
-    │   └── useLivePrice.js  real-time price feed
-    └── components/
-        ├── Navbar.jsx  TickerTape.jsx  PriceChart.jsx  ForecastPanel.jsx
-        ├── MetricsCards.jsx  BacktestChart.jsx  Leaderboard.jsx
-        ├── WhatIf.jsx  LiveTape.jsx
-        └── Plot.jsx         Plotly wrapper (finance bundle = smaller)
+    │   ├── useTheme.js      theme (saved in the browser) + Plotly colours
+    │   ├── useLivePrice.js  real-time price feed
+    │   └── useHashRoute.js  #/ , #/model , #/scenario , #/api
+    ├── components/
+    │   ├── TopBar.jsx  MarketBar.jsx  StatusBar.jsx  Icons.jsx
+    │   ├── PriceChart.jsx  ForecastPanel.jsx  ForecastTable.jsx
+    │   ├── BacktestChart.jsx  Leaderboard.jsx  LiveTicks.jsx
+    │   └── Plot.jsx         Plotly wrapper (finance bundle = smaller)
+    └── views/
+        ├── TerminalView.jsx  ModelView.jsx  ScenarioView.jsx  ApiView.jsx
 ```
 
 ## Run it
@@ -62,16 +83,11 @@ npm run build                     # output in frontend/dist
 ```
 
 **Docker / compose:** see [04_DOCKER_AND_COMPOSE.md](04_DOCKER_AND_COMPOSE.md). The dashboard is on http://localhost:3000.
+**Kubernetes:** served at http://btc-forecast.local/ (see [11_KUBERNETES.md](11_KUBERNETES.md)).
 
 ## Theme
 
-- The button in the navbar switches between dark and light.
-- The choice is saved in the browser (localStorage).
+- The sun/moon button in the top bar switches theme; the choice is saved in the browser.
 - `?theme=light` or `?theme=dark` in the URL forces a theme (used for screenshots).
-- All colours are CSS variables in `styles.css` (`:root[data-theme="dark"]` / `"light"`); Plotly
-  colours come from `chartColors()` in `useTheme.js`.
-
-## Kubernetes notes (for Part D)
-
-Deploy the `btc-forecast-ui` image as its own Deployment + Service (container port **8080**) and set
-the env var `API_UPSTREAM=<api-service-name>:80`. In the Ingress, route `/` to the UI service.
+- Colours are CSS variables in `styles.css` (`:root[data-theme="dark"|"light"]`); Plotly colours come
+  from `chartColors()` in `useTheme.js`.

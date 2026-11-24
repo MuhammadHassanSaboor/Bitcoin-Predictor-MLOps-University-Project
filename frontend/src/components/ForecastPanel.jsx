@@ -1,97 +1,88 @@
-import { fmtDate, fmtPct, fmtUsd } from "../api";
+import { fmtDate, fmtPct, fmtUsd, signalFrom } from "../api";
+import { IconBolt } from "./Icons";
 
-export default function ForecastPanel({ forecast, days, setDays, onRun, running, error }) {
+// Side panel: choose horizon, see the target, signal and key numbers.
+export default function ForecastPanel({ forecast, metrics, days, onDays, onRun, running, error }) {
   const preds = forecast?.predictions || [];
-  const last = preds.at(-1);
-  const up = (last?.change_pct ?? 0) >= 0;
-  const maxAbs = Math.max(0.5, ...preds.map((p) => Math.abs(p.change_pct)));
+  const target = preds.at(-1);
+  const up = (target?.change_pct ?? 0) >= 0;
+  const sig = signalFrom(target?.change_pct);
+  const spread = target ? ((target.upper_80 - target.lower_80) / target.predicted_close) * 100 : null;
 
   return (
-    <section className="card forecast-card">
-      <div className="card-head">
-        <div>
-          <h2>Forecast</h2>
-          <p className="muted">POST /predict · next {days} day{days > 1 ? "s" : ""}</p>
+    <section className="panel">
+      <div className="panel-head">
+        <div className="panel-title">
+          <h2>Price forecast</h2>
+          <p>Direct multi-horizon model · POST /predict</p>
         </div>
-        <span className="badge">{forecast?.model_name || "model"}</span>
+        <span className="badge info">{days}D</span>
       </div>
 
-      <label className="field-label" htmlFor="days">
-        Forecast horizon
-      </label>
-      <div className="seg full" id="days" role="radiogroup" aria-label="Forecast days">
-        {[1, 2, 3, 4, 5, 6, 7].map((d) => (
-          <button
-            key={d}
-            role="radio"
-            aria-checked={days === d}
-            className={days === d ? "active" : ""}
-            onClick={() => setDays(d)}
-          >
-            {d}D
-          </button>
-        ))}
+      <div className="panel-body" style={{ borderBottom: "1px solid var(--border)" }}>
+        <div className="label-sm" style={{ marginBottom: 8 }}>
+          Horizon
+        </div>
+        <div className="seg block" role="radiogroup" aria-label="Forecast horizon in days">
+          {[1, 2, 3, 4, 5, 6, 7].map((d) => (
+            <button key={d} role="radio" aria-checked={days === d} className={days === d ? "active" : ""} onClick={() => onDays(d)}>
+              {d}D
+            </button>
+          ))}
+        </div>
+        <button className="btn btn-primary block" style={{ marginTop: 12 }} onClick={onRun} disabled={running}>
+          {running ? <span className="spinner" /> : <IconBolt />}
+          {running ? "Running forecast" : "Run forecast"}
+        </button>
+        {error && (
+          <div className="alert" style={{ marginTop: 10 }}>
+            {error}
+          </div>
+        )}
       </div>
 
-      <button className="primary-btn" onClick={onRun} disabled={running}>
-        {running ? <span className="spinner" /> : "⚡"} {running ? "Forecasting…" : "Run forecast"}
-      </button>
-
-      {error && <div className="error-box">{error}</div>}
-
-      {last && (
-        <div className={`headline ${up ? "up" : "down"}`}>
-          <span className="muted small">Target on {fmtDate(last.date, { weekday: "short", month: "short", day: "numeric" })}</span>
-          <span className="headline-price mono">{fmtUsd(last.predicted_close)}</span>
-          <span className={`chip ${up ? "up" : "down"}`}>
-            {up ? "▲" : "▼"} {fmtPct(last.change_pct)} vs {fmtUsd(forecast.last_close, 0)}
-          </span>
-          <span className="muted small">
-            80% range {fmtUsd(last.lower_80, 0)} – {fmtUsd(last.upper_80, 0)}
-          </span>
+      <div className="fc-target">
+        <span className="label-sm">
+          Target · {target ? fmtDate(target.date, { weekday: "short", month: "short", day: "numeric" }) : "—"}
+        </span>
+        <span className={`price num ${target ? (up ? "up" : "down") : ""}`}>{fmtUsd(target?.predicted_close)}</span>
+        <div className="fc-row">
+          <span className={`badge ${up ? "up" : "down"} num`}>{fmtPct(target?.change_pct)}</span>
+          <span className="muted">vs last close {fmtUsd(forecast?.last_close, 0)}</span>
         </div>
-      )}
+      </div>
 
-      <table className="ftable">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th className="num">Price</th>
-            <th className="num">Change</th>
-          </tr>
-        </thead>
-        <tbody>
-          {preds.map((p) => {
-            const pos = p.change_pct >= 0;
-            return (
-              <tr key={p.date}>
-                <td>
-                  <span className="day-dot">D{p.day}</span> {fmtDate(p.date, { weekday: "short", day: "numeric", month: "short" })}
-                </td>
-                <td className="num mono">{fmtUsd(p.predicted_close)}</td>
-                <td className="num">
-                  <div className="bar-cell">
-                    <span className={`mono ${pos ? "up" : "down"}`}>{fmtPct(p.change_pct)}</span>
-                    <span className="mini-bar">
-                      <span
-                        className={pos ? "pos" : "neg"}
-                        style={{ width: `${(Math.abs(p.change_pct) / maxAbs) * 100}%` }}
-                      />
-                    </span>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-          {!preds.length && (
-            <tr>
-              <td colSpan={3} className="muted center">
-                No forecast yet
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <div className="signal">
+        <div className="fc-row" style={{ justifyContent: "space-between" }}>
+          <span className="label-sm">Model signal</span>
+          <span className={`badge ${sig.tone}`}>{sig.label}</span>
+        </div>
+        <div className="meter" aria-hidden="true">
+          <span className="needle" style={{ left: `${sig.score}%` }} />
+        </div>
+        <div className="meter-labels">
+          <span>Bearish</span>
+          <span>Neutral</span>
+          <span>Bullish</span>
+        </div>
+      </div>
+
+      <div className="panel-body">
+        <dl className="kv">
+          <dt>80% range</dt>
+          <dd className="num">
+            {target ? `${fmtUsd(target.lower_80, 0)} – ${fmtUsd(target.upper_80, 0)}` : "—"}
+          </dd>
+          <dt>Range width</dt>
+          <dd className="num">{fmtPct(spread, 1, false)}</dd>
+          <dt>Model</dt>
+          <dd title={forecast?.model_name}>{forecast?.model_name?.replace("Ensemble ", "Ens. ") || "—"}</dd>
+          <dt>Test MAPE</dt>
+          <dd className="num">{metrics?.mape != null ? `${metrics.mape.toFixed(2)}%` : "—"}</dd>
+          <dt>Data up to</dt>
+          <dd className="num">{forecast?.last_date || "—"}</dd>
+        </dl>
+      </div>
     </section>
   );
 }

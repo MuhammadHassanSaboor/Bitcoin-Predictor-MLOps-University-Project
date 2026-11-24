@@ -11,7 +11,7 @@ Airflow / Kubeflow and deployed on Kubernetes.
 | Muhammad Hassan Saboor | 25L-8014 | Data, ML model, Flask API, React UI, Docker, CI/CD |
 | Mudassar Zulfiqar | 24L-8000 | ETL (Airflow), Kubeflow, Kubernetes |
 
-![Dashboard](Docs/screenshots/react-dashboard/dashboard_dark.png)
+![Dashboard](Docs/screenshots/react-dashboard/terminal_dark.png)
 
 ## Architecture
 

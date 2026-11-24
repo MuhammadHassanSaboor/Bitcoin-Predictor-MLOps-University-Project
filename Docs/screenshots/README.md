@@ -43,12 +43,13 @@ Terminal screenshots are rendered from the exact command and output captured whi
 
 | File | Shows |
 |---|---|
-| `react-dashboard/dashboard_dark.png` | Full dashboard, dark theme |
-| `react-dashboard/dashboard_light.png` | Full dashboard, light theme |
-| `react-dashboard/price_chart.png` | Candlestick chart with MA 7/30, volume and 7-day forecast band |
-| `react-dashboard/forecast_panel.png` | Forecast panel close-up |
-| `react-dashboard/model_leaderboard.png` | Model leaderboard (CV MAPE) |
-| `react-dashboard/whatif_simulator.png` | What-if simulator (custom history → /predict) |
+| `react-dashboard/terminal_dark.png` | Terminal page: chart, forecast panel, forecast table (dark) |
+| `react-dashboard/terminal_light.png` | Terminal page (light) |
+| `react-dashboard/terminal_live_ticks.png` | Live tick chart from the market feed |
+| `react-dashboard/model_dark.png` / `model_light.png` | Model page: KPIs, model card, backtest, leaderboard |
+| `react-dashboard/scenario_dark.png` / `scenario_light.png` | Scenario Lab: custom history → POST /predict |
+| `react-dashboard/api_console_dark.png` / `api_console_light.png` | Live API console calling POST /predict |
+| `react-dashboard/mobile_dark.png` | Mobile layout |
 
 ## Part C: Airflow & Kubeflow
 
