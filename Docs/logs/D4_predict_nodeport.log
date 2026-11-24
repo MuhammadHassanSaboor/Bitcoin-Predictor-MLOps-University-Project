@@ -1,0 +1,92 @@
+$ minikube service btc-forecast-nodeport --url
+http://127.0.0.1:65303
+
+$ curl http://127.0.0.1:65303/health
+{"status":"ok","uptime_seconds":48.6,"model_loaded":true,"model_version":"v20261123-1217","model_name":"Ensemble (XGBoost + Random Forest)","model_stage":"production","pod":"btc-forecast-api-76b9d878cd-8szds"}
+
+
+$ curl -X POST http://127.0.0.1:65303/predict -H 'Content-Type: application/json' -d '{"forecast_days": 7}'
+{
+    "model_version": "v20261123-1217",
+    "model_name": "Ensemble (XGBoost + Random Forest)",
+    "forecast_days": 7,
+    "based_on": "latest_market_data",
+    "last_close": 61161.91,
+    "last_date": "2026-11-22",
+    "predictions": [
+        {
+            "day": 1,
+            "date": "2026-11-23",
+            "predicted_close": 61109.58,
+            "lower_80": 59572.17,
+            "upper_80": 62456.39,
+            "change_pct": -0.086
+        },
+        {
+            "day": 2,
+            "date": "2026-11-24",
+            "predicted_close": 61092.92,
+            "lower_80": 58750.87,
+            "upper_80": 63037.89,
+            "change_pct": -0.113
+        },
+        {
+            "day": 3,
+            "date": "2026-11-25",
+            "predicted_close": 61349.04,
+            "lower_80": 58563.37,
+            "upper_80": 63585.76,
+            "change_pct": 0.306
+        },
+        {
+            "day": 4,
+            "date": "2026-11-26",
+            "predicted_close": 61272.48,
+            "lower_80": 58159.01,
+            "upper_80": 63767.32,
+            "change_pct": 0.181
+        },
+        {
+            "day": 5,
+            "date": "2026-11-27",
+            "predicted_close": 61234.71,
+            "lower_80": 57991.95,
+            "upper_80": 64116.01,
+            "change_pct": 0.119
+        },
+        {
+            "day": 6,
+            "date": "2026-11-28",
+            "predicted_close": 60997.63,
+            "lower_80": 57197.78,
+            "upper_80": 64266.92,
+            "change_pct": -0.269
+        },
+        {
+            "day": 7,
+            "date": "2026-11-29",
+            "predicted_close": 60976.41,
+            "lower_80": 56913.18,
+            "upper_80": 64327.49,
+            "change_pct": -0.303
+        }
+    ]
+}
+
+$ curl http://127.0.0.1:65303/metrics   (MAE / RMSE / MAPE)
+{
+  "model_version": "v20261123-1217",
+  "model_name": "Ensemble (XGBoost + Random Forest)",
+  "mae": 3316.91,
+  "rmse": 3957.74,
+  "mape": 5.468,
+  "direction_accuracy": 14.3
+}
+
+# load balancing: 'pod' field over 6 calls to the Service
+btc-forecast-api-76b9d878cd-qs2pj
+btc-forecast-api-76b9d878cd-qs2pj
+btc-forecast-api-76b9d878cd-8g6fn
+btc-forecast-api-76b9d878cd-qs2pj
+btc-forecast-api-76b9d878cd-8g6fn
+btc-forecast-api-76b9d878cd-qs2pj

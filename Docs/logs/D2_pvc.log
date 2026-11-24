@@ -1,0 +1,17 @@
+$ kubectl get pvc
+NAME             STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+btc-models-pvc   Bound    pvc-92bc99f4-9c8a-4cae-9783-bfcb514f5318   1Gi        RWO            standard       <unset>                 5m54s
+
+$ kubectl get pv
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                    STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+pvc-92bc99f4-9c8a-4cae-9783-bfcb514f5318   1Gi        RWO            Delete           Bound    default/btc-models-pvc   standard       <unset>                          5m53s
+
+$ kubectl exec btc-forecast-api-76b9d878cd-8g6fn -- ls -l /app/models   # seeded from the image on first start
+total 580
+-rw-r--r-- 1 appuser appuser   4821 Nov 23 14:10 metrics.json
+-rw-r--r-- 1 appuser appuser 579939 Nov 23 14:10 model.pkl
+-rw-r--r-- 1 appuser appuser     15 Nov 23 14:10 model_version.txt
+
+$ kubectl exec btc-forecast-api-76b9d878cd-8g6fn -- df -h /app/models
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sde       1007G   13G  944G   2% /app/models

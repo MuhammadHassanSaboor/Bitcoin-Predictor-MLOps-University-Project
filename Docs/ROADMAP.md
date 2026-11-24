@@ -334,7 +334,7 @@ npm run dev        # opens http://localhost:5173 (Flask must run on :5000)
 ```
 
 ### What the page shows (React + Plotly, stock-market style)
-1. **Navbar:** live BTC price (real-time feed), 24h change, API status, model version, 🌙/☀️ theme button.
+1. **Top bar + market bar:** page tabs, live BTC price (real-time feed), 24h stats, API status, model version, theme button.
 2. **Ticker tape:** scrolling 24h high/low/volume + forecast numbers.
 3. **Price chart:** candlesticks + MA 7 + MA 30 + volume + 7-day forecast with 80% range.
 4. **Forecast panel:** choose 1–7 days → calls `POST /predict`.

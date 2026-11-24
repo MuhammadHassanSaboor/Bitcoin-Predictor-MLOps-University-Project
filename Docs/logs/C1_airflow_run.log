@@ -1,0 +1,26 @@
+$ airflow dags list-runs -d btc_etl_pipeline
+dag_id            run_id                                state    execution_date             start_date                        end_date
+btc_etl_pipeline  manual__2026-11-23T21:34:29+00:00     success  2026-11-23T21:34:29+00:00  2026-11-23T21:58:08.840048+00:00  2026-11-23T22:24:28.862123+00:00
+btc_etl_pipeline  scheduled__2026-11-22T00:00:00+00:00  running  2026-11-22T00:00:00+00:00  2026-11-23T22:24:29.541608+00:00
+
+$ airflow tasks states-for-dag-run btc_etl_pipeline manual__2026-11-23T21:34:29+00:00
+task_id              start_date                        end_date
+train_and_evaluate   2026-11-23T22:05:54.653508+00:00  2026-11-23T22:24:25.673849+00:00
+preprocess_features  2026-11-23T21:58:17.796762+00:00  2026-11-23T21:58:19.498853+00:00
+fetch_data           2026-11-23T21:58:09.091632+00:00  2026-11-23T21:58:16.907917+00:00
+reload_api_model     2026-11-23T22:24:27.123609+00:00  2026-11-23T22:24:28.088680+00:00
+
+$ curl http://localhost:5000/health   # AFTER the run
+{"status":"ok","uptime_seconds":3193.0,"model_loaded":true,"model_version":"v20261123-2224","model_name":"Ensemble (XGBoost + Random Forest)","model_stage":"local","pod":"48b8f6c0efc2"}
+
+
+$ curl http://localhost:5000/metrics  (summary)
+{
+  "model_version": "v20261123-2224",
+  "model_name": "Ensemble (XGBoost + Random Forest)",
+  "trained_at": "2026-11-23T22:24:25+00:00",
+  "data_last_date": "2026-11-22",
+  "mae": 3330.13,
+  "rmse": 3977.17,
+  "mape": 5.49
+}

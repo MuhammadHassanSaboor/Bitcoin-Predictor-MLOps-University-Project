@@ -11,7 +11,7 @@ Airflow / Kubeflow and deployed on Kubernetes.
 | Muhammad Hassan Saboor | 25L-8014 | Data, ML model, Flask API, React UI, Docker, CI/CD |
 | Mudassar Zulfiqar | 24L-8000 | ETL (Airflow), Kubeflow, Kubernetes |
 
-![Dashboard](Docs/screenshots/react-dashboard/dashboard_dark.png)
+![Dashboard](Docs/screenshots/react-dashboard/terminal_dark.png)
 
 ## Architecture
 
@@ -42,6 +42,7 @@ models/                  registered model: model.pkl, metrics.json, model_versio
 dags/                    Airflow DAG: btc_etl_pipeline.py
 kubeflow/                Kubeflow pipeline: btc_kfp_pipeline.py (+ compiled YAML)
 k8s/                     Kubernetes manifests
+loadtest/                Locust load test for the HPA demo
 .github/workflows/       ci_cd.yml
 docker-compose.yml       API + UI + Airflow + Postgres for local integration
 Docs/                    roadmap, step-by-step docs, screenshots, logs
@@ -81,6 +82,17 @@ docker compose up -d --build            # UI :3000 · API :5000 · Airflow :8080
 | GET | `/metrics` | MAE, RMSE, MAPE of the latest validation run |
 | GET | `/history` | recent OHLCV for charts |
 | POST | `/reload` | reload model after retraining (needs `X-API-Key`) |
+
+## Deliverables
+
+| Deliverable | Link |
+|---|---|
+| Technical report (PDF, 6 pages) | [Docs/BTC_Forecast_MLOps_Assignment3_Report.pdf](Docs/BTC_Forecast_MLOps_Assignment3_Report.pdf) |
+| Docker images | [hassansaboor/btc-forecast-api](https://hub.docker.com/r/hassansaboor/btc-forecast-api) · [hassansaboor/btc-forecast-ui](https://hub.docker.com/r/hassansaboor/btc-forecast-ui) |
+| Airflow DAG | [dags/btc_etl_pipeline.py](dags/btc_etl_pipeline.py) |
+| Kubeflow pipeline | [kubeflow/btc_kfp_pipeline.py](kubeflow/btc_kfp_pipeline.py) · [compiled YAML](kubeflow/btc_kfp_pipeline.yaml) |
+| Kubernetes manifests | [k8s/](k8s/) |
+| CI/CD workflow | [.github/workflows/ci_cd.yml](.github/workflows/ci_cd.yml) |
 
 ## Documentation
 

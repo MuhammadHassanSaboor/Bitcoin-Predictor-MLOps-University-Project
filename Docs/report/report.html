@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>BTC 7-Day Forecast: Production MLOps Pipeline (Assignment 3 Report)</title>
+<style>
+  @page { size: A4; margin: 13mm 13mm 14mm 13mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Inter, Arial, sans-serif; font-size: 9.4pt; line-height: 1.42; color: #1b2430; margin: 0; }
+  h1 { font-size: 19pt; margin: 0 0 2mm; color: #0e1726; letter-spacing: -0.01em; }
+  h2 { font-size: 12.5pt; margin: 5mm 0 2mm; padding-bottom: 1.2mm; border-bottom: 1.5px solid #f7931a; color: #0e1726; break-after: avoid; }
+  h3 { font-size: 10pt; margin: 3mm 0 1.2mm; color: #0e1726; break-after: avoid; }
+  p { margin: 0 0 2mm; }
+  ul { margin: 0 0 2mm; padding-left: 5mm; }
+  li { margin-bottom: 0.6mm; }
+  code, .mono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 8.6pt; }
+  code { background: #f1f4f8; padding: 0 1mm; border-radius: 1mm; }
+  a { color: #b45f06; text-decoration: none; }
+  .page-break { break-before: page; }
+  .subtitle { color: #4b5768; font-size: 10.5pt; margin-bottom: 4mm; }
+  .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5mm 8mm; padding: 3mm 4mm; background: #f7f9fc; border: 1px solid #e3e8ef; border-radius: 2mm; margin-bottom: 3mm; }
+  .meta b { color: #0e1726; }
+  table { width: 100%; border-collapse: collapse; margin: 1mm 0 2.5mm; font-size: 8.7pt; break-inside: avoid; }
+  th { text-align: left; background: #f1f4f8; color: #334155; font-weight: 600; }
+  th, td { padding: 1mm 2mm; border: 1px solid #e3e8ef; vertical-align: top; }
+  td.r, th.r { text-align: right; }
+  .ok { color: #0f8a55; font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin: 1.5mm 0 2.5mm; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm; margin: 1.5mm 0 2.5mm; }
+  figure { margin: 0; break-inside: avoid; }
+  figure img { width: 100%; display: block; border: 1px solid #dfe5ec; border-radius: 1.2mm; }
+  figure img.crop { object-fit: cover; object-position: top left; }
+  figcaption { font-size: 7.8pt; color: #5b6675; margin-top: 0.8mm; }
+  .wide { margin: 1.5mm 0 2.5mm; }
+  .callout { border-left: 3px solid #f7931a; background: #fff8ef; padding: 2mm 3mm; margin: 2mm 0 3mm; border-radius: 0 1.5mm 1.5mm 0; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5mm; margin: 2mm 0 3mm; }
+  .kpi { border: 1px solid #e3e8ef; border-radius: 1.5mm; padding: 2mm 2.5mm; }
+  .kpi .v { font-size: 13pt; font-weight: 700; color: #0e1726; }
+  .kpi .l { font-size: 7.6pt; color: #5b6675; text-transform: uppercase; letter-spacing: .04em; }
+  .small { font-size: 8.2pt; color: #4b5768; }
+  svg text { font-family: "Segoe UI", Arial, sans-serif; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ PAGE 1 -->
+<h1>Bitcoin 7-Day Price Forecast: Production MLOps Pipeline</h1>
+<div class="subtitle">MLOps Assignment 3 · Microservices, ETL, Orchestration &amp; Kubernetes Deployment · Technical Report</div>
+
+<div class="meta">
+  <div><b>Muhammad Hassan Saboor</b> · 25L-8014<br><span class="small">Data &amp; ML model, Flask API, React UI, Docker, CI/CD</span></div>
+  <div><b>Mudassar Zulfiqar</b> · 24L-8000<br><span class="small">Airflow ETL, Kubeflow pipeline, Kubernetes, load &amp; chaos testing</span></div>
+  <div><b>GitHub:</b> <a href="https://github.com/MuhammadHassanSaboor/Bitcoin-Predictor-MLOps-University-Project">github.com/MuhammadHassanSaboor/Bitcoin-Predictor-MLOps-University-Project</a></div>
+  <div><b>Docker Hub:</b> <a href="https://hub.docker.com/r/hassansaboor/btc-forecast-api">hassansaboor/btc-forecast-api</a> · <a href="https://hub.docker.com/r/hassansaboor/btc-forecast-ui">hassansaboor/btc-forecast-ui</a></div>
+</div>
+
+<p>The system ingests daily BTC-USD prices, retrains a forecasting model every day, and serves the
+closing-price forecast for the next 7 days through a Flask REST API and a React dashboard. Every
+component is containerised, tested and published by GitHub Actions, orchestrated by Apache Airflow (with an
+equivalent Kubeflow pipeline), and deployed on Kubernetes (Minikube) with probes, persistent storage,
+autoscaling and an NGINX Ingress.</p>
+
+<h2>1. Architecture</h2>
+<svg viewBox="0 0 760 300" width="100%" style="height:66mm" role="img" aria-label="System architecture diagram">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+  </defs>
+  <style>
+    .box{fill:#fff;stroke:#cbd5e1;stroke-width:1.2;rx:8}
+    .hd{font-size:11.5px;font-weight:700;fill:#0e1726}
+    .tx{font-size:9.5px;fill:#475569}
+    .ln{stroke:#64748b;stroke-width:1.3;fill:none;marker-end:url(#a)}
+    .zone{fill:#f8fafc;stroke:#e2e8f0;stroke-dasharray:4 3}
+    .zt{font-size:10px;font-weight:700;fill:#94a3b8;letter-spacing:.06em}
+  </style>
+  <!-- CI/CD lane -->
+  <rect class="zone" x="4" y="4" width="752" height="64" rx="8"/>
+  <text class="zt" x="14" y="19">CI/CD</text>
+  <rect class="box" x="20" y="24" width="120" height="36"/><text class="hd" x="32" y="39">git push / PR</text><text class="tx" x="32" y="52">GitHub (main, branches)</text>
+  <rect class="box" x="190" y="24" width="250" height="36"/><text class="hd" x="202" y="39">GitHub Actions  ci_cd.yml</text><text class="tx" x="202" y="52">flake8 · black · pytest (47) · npm build · buildx</text>
+  <rect class="box" x="490" y="24" width="250" height="36"/><text class="hd" x="502" y="39">Docker Hub</text><text class="tx" x="502" y="52">btc-forecast-api / -ui  :latest + :&lt;git SHA&gt;</text>
+  <path class="ln" d="M140 42 H186"/><path class="ln" d="M440 42 H486"/>
+  <!-- data / orchestration lane -->
+  <rect class="zone" x="4" y="78" width="300" height="216" rx="8"/>
+  <text class="zt" x="14" y="93">ORCHESTRATION (daily)</text>
+  <rect class="box" x="20" y="100" width="130" height="34"/><text class="hd" x="30" y="114">Yahoo Finance</text><text class="tx" x="30" y="126">Binance API fallback</text>
+  <rect class="box" x="20" y="146" width="268" height="78"/><text class="hd" x="30" y="161">Airflow DAG  btc_etl_pipeline (@daily)</text>
+  <text class="tx" x="30" y="176">fetch_data → preprocess_features →</text>
+  <text class="tx" x="30" y="189">train_and_evaluate (register if MAPE &lt; 10%) →</text>
+  <text class="tx" x="30" y="202">reload_api_model (POST /reload, X-API-Key)</text>
+  <text class="tx" x="30" y="216">Kubeflow: same steps as KFP v2 container components</text>
+  <rect class="box" x="20" y="236" width="268" height="48"/><text class="hd" x="30" y="251">Model registry  (models/ → PVC)</text><text class="tx" x="30" y="265">model.pkl · metrics.json · model_version.txt</text><text class="tx" x="30" y="277">best_params.json · registry.json</text>
+  <path class="ln" d="M85 134 V142"/><path class="ln" d="M154 224 V232"/>
+  <!-- kubernetes lane -->
+  <rect class="zone" x="314" y="78" width="442" height="216" rx="8"/>
+  <text class="zt" x="324" y="93">KUBERNETES (MINIKUBE)</text>
+  <rect class="box" x="330" y="100" width="150" height="40"/><text class="hd" x="340" y="115">Ingress (NGINX)</text><text class="tx" x="340" y="128">btc-forecast.local</text>
+  <rect class="box" x="520" y="100" width="220" height="40"/><text class="hd" x="530" y="115">UI Deployment ×2 + Service</text><text class="tx" x="530" y="128">React + Nginx, /api → API Service</text>
+  <rect class="box" x="330" y="160" width="410" height="66"/><text class="hd" x="340" y="175">API Deployment btc-forecast-api (3 replicas, HPA 2–8 @ 60% CPU)</text>
+  <text class="tx" x="340" y="190">Flask + Gunicorn · liveness/readiness GET /health · 100m/128Mi → 500m/512Mi</text>
+  <text class="tx" x="340" y="204">Services: ClusterIP + NodePort 30080 (port 80 → 5000) · non-root uid 1000</text>
+  <text class="tx" x="340" y="218">ConfigMap (MODEL_STAGE, LOG_LEVEL, PORT) · Secret (API_KEY)</text>
+  <rect class="box" x="330" y="240" width="200" height="44"/><text class="hd" x="340" y="256">PVC btc-models-pvc (1Gi)</text><text class="tx" x="340" y="270">mounted at /app/models</text>
+  <rect class="box" x="550" y="240" width="190" height="44"/><text class="hd" x="560" y="256">metrics-server</text><text class="tx" x="560" y="270">CPU metrics for the HPA</text>
+  <path class="ln" d="M480 120 H516"/><path class="ln" d="M405 140 V156"/><path class="ln" d="M630 140 V156"/>
+  <path class="ln" d="M430 226 V236"/><path class="ln" d="M645 236 V230"/>
+  <path class="ln" d="M288 260 H326"/>
+  <path class="ln" d="M615 60 V96" stroke-dasharray="4 3"/>
+  <text class="tx" x="620" y="82">image pull</text>
+</svg>
+
+<h3>Repository structure (as required)</h3>
+<table style="font-size:8.2pt">
+  <tr><th>Path</th><th>Purpose</th><th>Path</th><th>Purpose</th></tr>
+  <tr><td><code>app/app.py</code>, <code>app/Dockerfile</code></td><td>Flask API, multi-stage image</td><td><code>k8s/*.yaml</code></td><td>ConfigMap/Secret, PVC, Deployment, Services, HPA, Ingress, UI</td></tr>
+  <tr><td><code>src/etl_fetch.py</code>, <code>src/train_forecast.py</code></td><td>ETL and training (+ <code>features.py</code>, <code>forecaster.py</code>)</td><td><code>.github/workflows/ci_cd.yml</code></td><td>Lint, test, build, push</td></tr>
+  <tr><td><code>dags/btc_etl_pipeline.py</code></td><td>Airflow daily DAG</td><td><code>docker-compose.yml</code></td><td>API + UI + Airflow + Postgres</td></tr>
+  <tr><td><code>kubeflow/btc_kfp_pipeline.py</code> (+ YAML)</td><td>Kubeflow pipeline, compiled spec</td><td><code>tests/</code>, <code>loadtest/</code>, <code>frontend/</code></td><td>pytest, Locust, React dashboard</td></tr>
+</table>
+
+<h3>Forecasting model</h3>
+<p>Daily OHLCV data since 2017 (3,613 days) is cleaned and turned into 21 scale-free features (lagged log-returns,
+3/7/14/30-day momentum, 7/30-day moving-average gaps, 7/30-day volatility, RSI-14, day of week). One model predicts
+the log-return to each of the next 7 days (<i>direct multi-horizon</i>). A random search over Ridge, Random Forest,
+Extra Trees, XGBoost and LightGBM (66 configurations, L1 and L2 losses, three training-window lengths) plus averaging
+ensembles is scored with <b>walk-forward cross-validation</b> (6 folds × 60 days, 7-day purge gap). The winner,
+<b>Ensemble (XGBoost + Random Forest)</b>, is evaluated on the most recent 7 held-out days and registered only if
+MAPE &lt; 10%. An 80% prediction interval comes from out-of-fold residuals.</p>
+
+<!-- ============================================================ PAGE 2 -->
+<h2 class="page-break">2. Part A: Flask REST API</h2>
+<table>
+  <tr><th>Endpoint</th><th>Behaviour</th><th>Validation / errors</th></tr>
+  <tr><td><code>GET /health</code></td><td>status, uptime, loaded model version, pod name (used by K8s probes)</td><td>always 200 while the process is alive</td></tr>
+  <tr><td><code>POST /predict</code></td><td><code>forecast_days</code> (1–7, default 7) or a custom <code>history</code> array (≥60 closes) → dates, prices, 80% range</td><td>400 for non-JSON, wrong types, out-of-range values; 503 without a model; 500 on internal failure</td></tr>
+  <tr><td><code>GET /metrics</code></td><td>MAE, RMSE, MAPE of the latest validation run, naive baseline, CV, leaderboard</td><td>JSON errors for 404/405; <code>/reload</code> requires <code>X-API-Key</code> (401)</td></tr>
+</table>
+<p>Production server: <code>gunicorn --bind 0.0.0.0:5000 --workers N --threads 2 app:app</code>. The model sits behind a lock so
+<code>/reload</code> swaps it with zero downtime. <b>47 pytest tests</b> (API, pipeline, K8s manifests) run in CI on a synthetic dataset.</p>
+<div class="grid2">
+  <figure><img class="crop" style="height:78mm" src="../screenshots/part-A_flask-api/A1_predict.png"><figcaption>A1: POST /predict returns 7 dates with forecasts and an 80% range</figcaption></figure>
+  <figure><img class="crop" style="height:78mm" src="../screenshots/part-A_flask-api/A1_metrics.png"><figcaption>A1: GET /metrics with test-window MAE / RMSE / MAPE, naive baseline and CV</figcaption></figure>
+</div>
+<div class="grid2">
+  <figure><img src="../screenshots/part-A_flask-api/A2_error_handling.png"><figcaption>A2: validation and error handling (400 / 401 / 404 / 405)</figcaption></figure>
+  <figure><img class="crop" style="height:52mm" src="../screenshots/part-A_flask-api/A3_gunicorn.png"><figcaption>A3: Gunicorn workers serving inside the container</figcaption></figure>
+</div>
+
+<h3>Model results (latest registered model)</h3>
+<table>
+  <tr><th>Metric (7-day test window, 16–22 Nov 2026)</th><th class="r">Model</th><th class="r">Naive (last price)</th><th>Walk-forward CV MAPE</th><th class="r">Value</th></tr>
+  <tr><td>MAE</td><td class="r">$3,317</td><td class="r">$3,206</td><td>Ensemble (XGBoost + RF)</td><td class="r">3.129%</td></tr>
+  <tr><td>RMSE</td><td class="r">$3,958</td><td class="r">$3,854</td><td>Best single model (XGBoost)</td><td class="r">3.140%</td></tr>
+  <tr><td>MAPE</td><td class="r">5.47%</td><td class="r">5.29%</td><td>Naive baseline</td><td class="r">3.118%</td></tr>
+</table>
+<p class="small">The test week contained a sudden ~10% drop that no price-only model could anticipate; both model and baseline missed
+it by a similar amount. Across 360 cross-validation days all ML models stay within 0.05 points of the naive forecast,
+which is the expected behaviour of a near-random-walk series. Robust (L1) losses and ensembling gave the lowest error
+among the ML models.</p>
+
+<!-- ============================================================ PAGE 3 -->
+<h2 class="page-break">3. Part B: Containerisation &amp; CI/CD</h2>
+<ul>
+  <li><b>B1 multi-stage Dockerfile:</b> <code>python:3.10-slim</code> builder installs a virtualenv; a fresh slim runtime copies only the venv and code, runs as non-root <code>appuser</code> (uid 1000), has a <code>HEALTHCHECK</code>, and bakes in a seed model. Switching to the CPU-only <code>xgboost-cpu</code> wheel removed ~650 MB of unused GPU libraries (1.97 GB → 803 MB; 178 MB compressed on Docker Hub). The UI image (Node build → <code>nginx-unprivileged</code>) is 21 MB compressed.</li>
+  <li><b>B2 docker-compose:</b> API, UI, Postgres 16, Airflow init/webserver/scheduler sharing <code>dags/ src/ data/ models/</code>, so a model trained by Airflow is picked up by the API through <code>/reload</code>.</li>
+  <li><b>B3/B4 GitHub Actions:</b> on every push to <code>main</code> and every PR: flake8, black, pytest, React build; then a matrix job builds both images with Buildx cache and, on <code>main</code>, logs in with <code>DOCKER_USERNAME</code>/<code>DOCKER_PASSWORD</code> secrets and pushes <code>:latest</code> and <code>:&lt;git SHA&gt;</code>.</li>
+</ul>
+<div class="grid2">
+  <figure><img class="crop" style="height:62mm" src="../screenshots/part-B_docker-cicd/B1_docker_build_api.png"><figcaption>B1: multi-stage build (builder → runtime stages)</figcaption></figure>
+  <figure><img src="../screenshots/part-B_docker-cicd/B2_compose_ps.png"><figcaption>B2: docker compose stack, all services healthy</figcaption><img style="margin-top:2mm" src="../screenshots/part-B_docker-cicd/B1_non_root_user.png"><figcaption>B1: container runs as non-root <code>appuser</code></figcaption></figure>
+</div>
+<div class="grid2">
+  <figure><img class="crop" style="height:70mm" src="../screenshots/part-B_docker-cicd/B3_actions_run_jobs.png"><figcaption>B3/B4: CI/CD run on main: lint &amp; tests → React build → Docker build &amp; push</figcaption></figure>
+  <figure><img class="crop" style="height:70mm" src="../screenshots/part-B_docker-cicd/B4_dockerhub_tags.png"><figcaption>B4: Docker Hub tags <code>latest</code> and the commit SHA</figcaption></figure>
+</div>
+
+<!-- ============================================================ PAGE 4 -->
+<h2 class="page-break">4. Part C: Airflow ETL &amp; Kubeflow Orchestration</h2>
+<p><b>C1:</b> <code>btc_etl_pipeline</code> runs <code>@daily</code> (catchup off, 2 retries, timeouts) with four TaskFlow tasks:
+<code>fetch_data → preprocess_features → train_and_evaluate → reload_api_model</code>. Training runs in a clean subprocess
+(Airflow's <code>dill</code> patches pickling, which would otherwise make the saved model unloadable by the API).
+The reload task is skipped when the new model fails the MAPE threshold, and it verifies that the API now serves the new version.</p>
+<figure class="wide"><img class="crop" style="height:60mm; object-position: 50% 82%" src="../screenshots/part-C_airflow-kubeflow/C1_dag_graph.png"><figcaption>C1: manual DAG run, all four tasks successful (graph view)</figcaption></figure>
+<table>
+  <tr><th>Task (manual run 23 Nov)</th><th class="r">Duration</th><th>Result</th></tr>
+  <tr><td>fetch_data</td><td class="r">8 s</td><td>3,613 daily rows from Yahoo Finance</td></tr>
+  <tr><td>preprocess_features</td><td class="r">2 s</td><td>3,553 rows × 21 features + 7 targets</td></tr>
+  <tr><td>train_and_evaluate</td><td class="r">18.5 min</td><td>v20261123-2224 registered (MAPE 5.49% &lt; 10%)</td></tr>
+  <tr><td>reload_api_model</td><td class="r">1 s</td><td><code>/health</code> reports the new version without a restart</td></tr>
+</table>
+<p><b>C2:</b> <code>kubeflow/btc_kfp_pipeline.py</code> (KFP v2.18) defines <code>ingest_data → generate_features → train_model</code>
+as container components running the published API image, plus a <code>log_metrics</code> component that publishes MAE/RMSE/MAPE
+as Kubeflow metrics. Data, model and metrics move between steps as tracked artifacts. The pipeline compiles to
+<code>btc_kfp_pipeline.yaml</code> and can be uploaded with a daily recurring run (<code>--host … --schedule</code>).</p>
+<div class="grid2">
+  <figure><img src="../screenshots/part-C_airflow-kubeflow/C2_kfp_compile.png"><figcaption>C2: compiled pipeline with its task graph and artifact types</figcaption></figure>
+  <figure><img class="crop" style="height:58mm" src="../screenshots/part-C_airflow-kubeflow/C1_run_success_health.png"><figcaption>C1/E2: run succeeded; API health shows the retrained model</figcaption></figure>
+</div>
+
+<!-- ============================================================ PAGE 5 -->
+<h2 class="page-break">5. Part D: Kubernetes Deployment &amp; Scaling</h2>
+<table>
+  <tr><th>Item</th><th>Configuration</th><th>Item</th><th>Configuration</th></tr>
+  <tr><td>D1 ConfigMap / Secret</td><td>MODEL_STAGE, LOG_LEVEL, PORT (+ workers, threshold) / API_KEY, both via <code>envFrom</code></td><td>D4 Services</td><td>ClusterIP + NodePort 30080, port 80 → 5000</td></tr>
+  <tr><td>D2 PVC</td><td>1Gi <code>btc-models-pvc</code> at <code>/app/models</code>, seeded from the image</td><td>D5 HPA</td><td>min 2, max 8, CPU 60%, fast scale-up, 2-min scale-down</td></tr>
+  <tr><td>D3 Deployment</td><td>3 replicas, liveness 15 s/10 s, readiness, 100m/128Mi → 500m/512Mi, non-root, zero-downtime rollout</td><td>D6 Ingress</td><td>NGINX, <code>btc-forecast.local</code>: API paths → API, <code>/</code> → dashboard</td></tr>
+</table>
+<div class="grid2">
+  <figure><img class="crop" style="height:46mm" src="../screenshots/part-D_kubernetes/D3_get_pods.png"><figcaption>D3: 3 API pods + 2 UI pods running and ready</figcaption></figure>
+  <figure><img class="crop" style="height:46mm" src="../screenshots/part-D_kubernetes/D6_ingress.png"><figcaption>D6: Ingress rules for btc-forecast.local</figcaption></figure>
+</div>
+<figure class="wide"><img src="../screenshots/part-D_kubernetes/D5_autoscaling_graph.png" style="max-height:92mm; object-fit:contain"><figcaption>D5: HPA under Locust load: replicas 2 → 4 → 6 → 8 within ~1.5 min of CPU passing 60%, then back to 2 after the test (from <code>kubectl get hpa --watch</code> samples and Locust history)</figcaption></figure>
+<table>
+  <tr><th>Load test (Locust, 100 users, 5 min)</th><th class="r">Requests</th><th class="r">Req/s</th><th class="r">Median</th><th class="r">Average</th><th class="r">Failures</th></tr>
+  <tr><td>POST /predict</td><td class="r">6,609</td><td class="r">22.2</td><td class="r">350 ms</td><td class="r">1,082 ms</td><td class="r">2.8%</td></tr>
+  <tr><td>All endpoints</td><td class="r">9,813</td><td class="r">32.9</td><td class="r">260 ms</td><td class="r">1,001 ms</td><td class="r">2.9%</td></tr>
+</table>
+<p class="small">All failures were dropped connections in the Minikube NodePort tunnel on Windows (no HTTP 5xx from the API). A first
+attempt with aggressive probes showed that liveness probes can restart pods that are only busy; the final probe uses a
+10 s timeout and 6 failures, so only a truly frozen container is restarted.</p>
+
+<!-- ============================================================ PAGE 6 -->
+<h2 class="page-break">6. Part E: Verification &amp; Resilience</h2>
+<div class="grid2">
+  <div>
+    <h3>E1: Chaos test / self-healing</h3>
+    <p>A running API pod was deleted with <code>kubectl delete pod</code>. The ReplicaSet saw fewer pods than desired and
+    scheduled a replacement immediately; the new pod passed its readiness probe and received traffic after
+    <b>19 s</b>. The remaining pod kept serving requests the whole time, so there was no downtime.</p>
+    <h3>E2: End-to-end verification</h3>
+    <ul>
+      <li>Airflow DAG triggered manually: all 4 tasks green, model <code>v20261123-2224</code> registered.</li>
+      <li>New model copied to the PVC and <code>POST /reload</code> sent to every pod: all 5 pods switched from
+      <code>v20261123-1217</code> to <code>v20261123-2224</code> without a restart.</li>
+      <li>GitHub Actions CI/CD green; images on Docker Hub.</li>
+      <li><code>POST http://btc-forecast.local/predict</code> returns the 7-day forecast from the live cluster.</li>
+    </ul>
+  </div>
+  <figure><img class="crop" style="height:100mm" src="../screenshots/part-E_verification/E1_pod_deleted_new_pod.png"><figcaption>E1: pod deleted → replacement created and ready</figcaption></figure>
+</div>
+<div class="grid2">
+  <figure><img class="crop" style="height:62mm" src="../screenshots/part-E_verification/E2_k8s_model_update.png"><figcaption>E2: model update rolled out to the Kubernetes pods, live 7-day prediction</figcaption></figure>
+  <figure><img class="crop" style="height:62mm" src="../screenshots/react-dashboard/terminal_dark.png"><figcaption>React dashboard (extra): live price, candles, forecast zone, signal and API console</figcaption></figure>
+</div>
+
+<h2>7. Performance Analysis &amp; Conclusion</h2>
+<ul>
+  <li><b>Model:</b> the ensemble is the best ML candidate (CV MAPE 3.129%) but only matches the naive baseline (3.118%), a known
+  property of daily crypto prices. The value of the pipeline is that the model is retrained, validated against a threshold
+  and redeployed automatically every day; better signals (on-chain data, funding rates, sentiment) can be added without
+  changing the infrastructure.</li>
+  <li><b>Serving:</b> one Gunicorn worker per pod keeps memory under 512Mi; the HPA handled a sustained ~33 req/s by scaling
+  from 2 to 8 pods and back. CPU-heavy <code>/predict</code> calls (~0.1–0.3 s each) dominate, so horizontal scaling, rather than more
+  threads per pod, is the right lever.</li>
+  <li><b>Reliability:</b> probes, a PVC-backed model with a baked-in seed, zero-downtime rolling updates and an authenticated
+  hot <code>/reload</code> let the service survive pod loss and model updates without downtime.</li>
+  <li><b>Lessons learned:</b> pin library versions across training and serving images; keep secrets in GitHub/Kubernetes
+  Secrets (a read-only Docker Hub token initially blocked the push); tune probes for busy, not just broken, containers.</li>
+</ul>
+</body>
+</html>

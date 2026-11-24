@@ -1,0 +1,18 @@
+# D2 - storage for model artifacts that survives pod restarts.
+# Mounted at /app/models in every API pod. When it is empty, the API copies
+# the model baked into the image (/app/seed_models) into it on start-up.
+#
+# Minikube's default "standard" StorageClass is hostPath-based, so all pods on
+# the single node can share this ReadWriteOnce volume.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: btc-models-pvc
+  labels:
+    app.kubernetes.io/part-of: btc-forecast
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

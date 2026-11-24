@@ -1,0 +1,10 @@
+$ kubectl get svc -o wide
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE     SELECTOR
+btc-forecast-api        ClusterIP   10.108.98.178   <none>        80/TCP         5m55s   app=btc-forecast-api
+btc-forecast-nodeport   NodePort    10.98.205.110   <none>        80:30080/TCP   5m55s   app=btc-forecast-api
+btc-forecast-ui         ClusterIP   10.100.199.42   <none>        80/TCP         5m56s   app=btc-forecast-ui
+kubernetes              ClusterIP   10.96.0.1       <none>        443/TCP        12m     <none>
+
+$ kubectl get endpoints btc-forecast-api
+NAME               ENDPOINTS                                           AGE
+btc-forecast-api   10.244.0.10:5000,10.244.0.11:5000,10.244.0.9:5000   5m55s

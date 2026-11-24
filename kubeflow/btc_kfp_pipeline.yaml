@@ -1,0 +1,248 @@
+# PIPELINE DEFINITION
+# Name: btc-7day-forecast
+# Description: Daily BTC-USD ingestion, feature generation and 7-day forecast model training
+# Inputs:
+#    best_params: str [Default: '{"xgboost": {"train_window": null, "subsample": 1.0, "reg_lambda": 10, "objective": "reg:absoluteerror", "n_estimators": 150, "min_child_weight": 5, "max_depth": 4, "learning_rate": 0.01, "colsample_bytree": 0.8}, "random_forest": {"train_window": 730, "n_estimators": 300, "min_samples_leaf": 100, "max_features": 0.3, "max_depth": null}, "ridge": {"train_window": 730, "alpha": 1000}, "extra_trees": {"train_window": 730, "n_estimators": 300, "min_samples_leaf": 100, "max_features": 0.3, "max_depth": null}, "lightgbm": {"train_window": 1460, "subsample_freq": 1, "subsample": 0.9, "reg_lambda": 20, "objective": "l1", "num_leaves": 4, "n_estimators": 300, "min_child_samples": 60, "learning_rate": 0.01, "colsample_bytree": 0.5}}']
+#    mape_threshold: float [Default: 10.0]
+components:
+  comp-generate-features:
+    executorLabel: exec-generate-features
+    inputDefinitions:
+      artifacts:
+        raw_data:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+    outputDefinitions:
+      artifacts:
+        features:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+  comp-ingest-data:
+    executorLabel: exec-ingest-data
+    outputDefinitions:
+      artifacts:
+        raw_data:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+  comp-log-metrics:
+    executorLabel: exec-log-metrics
+    inputDefinitions:
+      artifacts:
+        metrics_json:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+    outputDefinitions:
+      artifacts:
+        metrics:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+      parameters:
+        Output:
+          parameterType: BOOLEAN
+  comp-train-model:
+    executorLabel: exec-train-model
+    inputDefinitions:
+      artifacts:
+        features:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+      parameters:
+        best_params:
+          parameterType: STRING
+        mape_threshold:
+          parameterType: NUMBER_DOUBLE
+    outputDefinitions:
+      artifacts:
+        metrics_json:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+deploymentSpec:
+  executors:
+    exec-generate-features:
+      container:
+        args:
+        - "\n            export DATA_DIR=/tmp/work/data\n            mkdir -p \"$DATA_DIR/raw\"\
+          \n            cp \"$0\" \"$DATA_DIR/raw/btc_raw.csv\"\n            python\
+          \ -c \"from src.features import main; print(main())\"\n            mkdir\
+          \ -p \"$(dirname \"$1\")\"\n            cp \"$DATA_DIR/processed/btc_features.csv\"\
+          \ \"$1\"\n            "
+        - '{{$.inputs.artifacts[''raw_data''].path}}'
+        - '{{$.outputs.artifacts[''features''].path}}'
+        command:
+        - sh
+        - -ec
+        image: hassansaboor/btc-forecast-api:latest
+    exec-ingest-data:
+      container:
+        args:
+        - "\n            export DATA_DIR=/tmp/work/data\n            python -c \"\
+          from src.etl_fetch import main; print(main())\"\n            mkdir -p \"\
+          $(dirname \"$0\")\"\n            cp \"$DATA_DIR/raw/btc_raw.csv\" \"$0\"\
+          \n            "
+        - '{{$.outputs.artifacts[''raw_data''].path}}'
+        command:
+        - sh
+        - -ec
+        image: hassansaboor/btc-forecast-api:latest
+    exec-log-metrics:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - log_metrics
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.18.2'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef log_metrics(metrics_json: Input[Dataset], metrics: Output[Metrics])\
+          \ -> bool:\n    \"\"\"Publish MAE / RMSE / MAPE to the Kubeflow UI and return\
+          \ whether the model passed.\"\"\"\n    import json\n\n    with open(metrics_json.path)\
+          \ as f:\n        m = json.load(f)\n    metrics.log_metric(\"mae\", m[\"\
+          mae\"])\n    metrics.log_metric(\"rmse\", m[\"rmse\"])\n    metrics.log_metric(\"\
+          mape\", m[\"mape\"])\n    metrics.log_metric(\"naive_mape\", m[\"baseline_naive\"\
+          ][\"mape\"])\n    metrics.log_metric(\"cv_mape\", m[\"cv\"][\"mape\"])\n\
+          \    metrics.metadata[\"model_version\"] = m[\"model_version\"]\n    metrics.metadata[\"\
+          model_name\"] = m[\"model_name\"]\n    print(json.dumps({k: m[k] for k in\
+          \ (\"model_version\", \"mae\", \"rmse\", \"mape\")}, indent=2))\n    return\
+          \ bool(m[\"registered\"])\n\n"
+        image: python:3.10-slim
+    exec-train-model:
+      container:
+        args:
+        - "\n            export DATA_DIR=/tmp/work/data MODEL_DIR=/tmp/work/models\
+          \ MAPE_THRESHOLD=\"$3\"\n            mkdir -p \"$DATA_DIR/processed\" \"\
+          $MODEL_DIR\" \"$(dirname \"$1\")\" \"$(dirname \"$2\")\"\n            cp\
+          \ \"$0\" \"$DATA_DIR/processed/btc_features.csv\"\n            printf '%s'\
+          \ \"$4\" > \"$MODEL_DIR/best_params.json\"\n            python -c \"from\
+          \ src.train_forecast import main; print(main(tune=False))\"\n          \
+          \  if [ -f \"$MODEL_DIR/model.pkl\" ]; then\n                cp \"$MODEL_DIR/model.pkl\"\
+          \ \"$1\"\n                cp \"$MODEL_DIR/metrics.json\" \"$2\"\n      \
+          \      else\n                echo \"Model rejected by the MAPE threshold;\
+          \ exporting its metrics only\"\n                : > \"$1\"\n           \
+          \     cp \"$MODEL_DIR/rejected_metrics.json\" \"$2\"\n            fi\n \
+          \           "
+        - '{{$.inputs.artifacts[''features''].path}}'
+        - '{{$.outputs.artifacts[''model''].path}}'
+        - '{{$.outputs.artifacts[''metrics_json''].path}}'
+        - '{{$.inputs.parameters[''mape_threshold'']}}'
+        - '{{$.inputs.parameters[''best_params'']}}'
+        command:
+        - sh
+        - -ec
+        image: hassansaboor/btc-forecast-api:latest
+        resources:
+          cpuLimit: 2.0
+          memoryLimit: 2.0
+          resourceCpuLimit: '2'
+          resourceMemoryLimit: 2G
+pipelineInfo:
+  description: Daily BTC-USD ingestion, feature generation and 7-day forecast model
+    training
+  name: btc-7day-forecast
+root:
+  dag:
+    tasks:
+      generate-features:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-generate-features
+        dependentTasks:
+        - ingest-data
+        inputs:
+          artifacts:
+            raw_data:
+              taskOutputArtifact:
+                outputArtifactKey: raw_data
+                producerTask: ingest-data
+        taskInfo:
+          name: Generate features
+      ingest-data:
+        cachingOptions: {}
+        componentRef:
+          name: comp-ingest-data
+        taskInfo:
+          name: Ingest BTC-USD data
+      log-metrics:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-log-metrics
+        dependentTasks:
+        - train-model
+        inputs:
+          artifacts:
+            metrics_json:
+              taskOutputArtifact:
+                outputArtifactKey: metrics_json
+                producerTask: train-model
+        taskInfo:
+          name: Log metrics
+      train-model:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-train-model
+        dependentTasks:
+        - generate-features
+        inputs:
+          artifacts:
+            features:
+              taskOutputArtifact:
+                outputArtifactKey: features
+                producerTask: generate-features
+          parameters:
+            best_params:
+              componentInputParameter: best_params
+            mape_threshold:
+              componentInputParameter: mape_threshold
+        taskInfo:
+          name: Train & evaluate model
+  inputDefinitions:
+    parameters:
+      best_params:
+        defaultValue: '{"xgboost": {"train_window": null, "subsample": 1.0, "reg_lambda":
+          10, "objective": "reg:absoluteerror", "n_estimators": 150, "min_child_weight":
+          5, "max_depth": 4, "learning_rate": 0.01, "colsample_bytree": 0.8}, "random_forest":
+          {"train_window": 730, "n_estimators": 300, "min_samples_leaf": 100, "max_features":
+          0.3, "max_depth": null}, "ridge": {"train_window": 730, "alpha": 1000},
+          "extra_trees": {"train_window": 730, "n_estimators": 300, "min_samples_leaf":
+          100, "max_features": 0.3, "max_depth": null}, "lightgbm": {"train_window":
+          1460, "subsample_freq": 1, "subsample": 0.9, "reg_lambda": 20, "objective":
+          "l1", "num_leaves": 4, "n_estimators": 300, "min_child_samples": 60, "learning_rate":
+          0.01, "colsample_bytree": 0.5}}'
+        isOptional: true
+        parameterType: STRING
+      mape_threshold:
+        defaultValue: 10.0
+        isOptional: true
+        parameterType: NUMBER_DOUBLE
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.18.2

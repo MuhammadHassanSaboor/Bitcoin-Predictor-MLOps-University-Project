@@ -1,0 +1,36 @@
+$ kubectl get ingress
+NAME           CLASS   HOSTS                ADDRESS        PORTS   AGE
+btc-forecast   nginx   btc-forecast.local   192.168.49.2   80      74s
+
+$ kubectl describe ingress btc-forecast
+Rules:
+  Host                Path  Backends
+  ----                ----  --------
+  btc-forecast.local  
+                      /health    btc-forecast-api:80 (10.244.0.11:5000,10.244.0.9:5000,10.244.0.10:5000 + 4 more...)
+                      /predict   btc-forecast-api:80 (10.244.0.11:5000,10.244.0.9:5000,10.244.0.10:5000 + 4 more...)
+                      /metrics   btc-forecast-api:80 (10.244.0.11:5000,10.244.0.9:5000,10.244.0.10:5000 + 4 more...)
+                      /history   btc-forecast-api:80 (10.244.0.11:5000,10.244.0.9:5000,10.244.0.10:5000 + 4 more...)
+                      /reload    btc-forecast-api:80 (10.244.0.11:5000,10.244.0.9:5000,10.244.0.10:5000 + 4 more...)
+                      /          btc-forecast-ui:80 (10.244.0.7:8080,10.244.0.8:8080)
+Annotations:          nginx.ingress.kubernetes.io/proxy-read-timeout: 60
+$ type C:\Windows\System32\drivers\etc\hosts | findstr btc
+127.0.0.1 btc-forecast.local
+
+$ curl http://btc-forecast.local/health
+{"status":"ok","uptime_seconds":93.6,"model_loaded":true,"model_version":"v20261123-1217","model_name":"Ensemble (XGBoost + Random Forest)","model_stage":"production","pod":"btc-forecast-api-76b9d878cd-8g6fn"}
+
+
+$ curl -X POST http://btc-forecast.local/predict -d '{"forecast_days": 3}'
+{"model_version": "v20261123-1217", "forecast_days": 3, "last_close": 61161.91}
+2026-11-23 61109.58
+2026-11-24 61092.92
+2026-11-25 61349.04
+
+$ curl -I http://btc-forecast.local/   # React dashboard via the UI service
+HTTP/1.1 200 OK
+Date: Mon, 23 Nov 2026 22:18:22 GMT
+Content-Type: text/html
+Content-Length: 878
+$ curl http://btc-forecast.local/api/metrics   # dashboard -> Nginx -> API
+{'model_version': 'v20261123-1217', 'mae': 3316.91, 'rmse': 3957.74, 'mape': 5.468}

@@ -1,0 +1,12 @@
+$ python kubeflow/btc_kfp_pipeline.py
+Compiled pipeline -> kubeflow\btc_kfp_pipeline.yaml
+
+kfp 2.18.2 | pipeline: btc-7day-forecast | schema 2.1.0
+
+Parameters: {'best_params': 'STRING', 'mape_threshold': 'NUMBER_DOUBLE'}
+
+Tasks (DAG):
+  generate-features  after=['ingest-data']  in=['raw_data']  out={'features': 'system.Dataset'}  image=hassansaboor/btc-forecast-api:latest
+  ingest-data        after=-  in=-  out={'raw_data': 'system.Dataset'}  image=hassansaboor/btc-forecast-api:latest
+  log-metrics        after=['train-model']  in=['metrics_json']  out={'metrics': 'system.Metrics'}  image=python:3.10-slim
+  train-model        after=['generate-features']  in=['features']  out={'metrics_json': 'system.Dataset', 'model': 'system.Model'}  image=hassansaboor/btc-forecast-api:latest
