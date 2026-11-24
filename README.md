@@ -83,6 +83,17 @@ docker compose up -d --build            # UI :3000 · API :5000 · Airflow :8080
 | GET | `/history` | recent OHLCV for charts |
 | POST | `/reload` | reload model after retraining (needs `X-API-Key`) |
 
+## Deliverables
+
+| Deliverable | Link |
+|---|---|
+| Technical report (PDF, 6 pages) | [Docs/BTC_Forecast_MLOps_Assignment3_Report.pdf](Docs/BTC_Forecast_MLOps_Assignment3_Report.pdf) |
+| Docker images | [hassansaboor/btc-forecast-api](https://hub.docker.com/r/hassansaboor/btc-forecast-api) · [hassansaboor/btc-forecast-ui](https://hub.docker.com/r/hassansaboor/btc-forecast-ui) |
+| Airflow DAG | [dags/btc_etl_pipeline.py](dags/btc_etl_pipeline.py) |
+| Kubeflow pipeline | [kubeflow/btc_kfp_pipeline.py](kubeflow/btc_kfp_pipeline.py) · [compiled YAML](kubeflow/btc_kfp_pipeline.yaml) |
+| Kubernetes manifests | [k8s/](k8s/) |
+| CI/CD workflow | [.github/workflows/ci_cd.yml](.github/workflows/ci_cd.yml) |
+
 ## Documentation
 
 Everything is explained step by step in [`Docs/`](Docs/README.md).

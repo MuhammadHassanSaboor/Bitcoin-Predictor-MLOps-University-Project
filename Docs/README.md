@@ -17,6 +17,9 @@ Read in this order:
 | 10 | [10_KUBEFLOW_PIPELINE.md](10_KUBEFLOW_PIPELINE.md) | KFP v2 container components, compiled YAML (Part C2) | Mudassar |
 | 11 | [11_KUBERNETES.md](11_KUBERNETES.md) | Minikube deploy, HPA load test, Ingress, self-healing (Part D, E1, E2) | Mudassar |
 
+**Final report (Part E3):** [BTC_Forecast_MLOps_Assignment3_Report.pdf](BTC_Forecast_MLOps_Assignment3_Report.pdf)
+(6 pages; source [report/report.html](report/report.html). Edit the HTML and print it to PDF from the browser to update.)
+
 Evidence for the report:
 
 - [screenshots/](screenshots/README.md): screenshots grouped by assignment part
